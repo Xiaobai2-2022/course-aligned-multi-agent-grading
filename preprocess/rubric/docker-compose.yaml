@@ -1,0 +1,54 @@
+name: rubric-preproc
+
+x-vllm-common: &vllm-common
+    restart: unless-stopped
+    ipc: host
+    gpus: all
+
+    environment:
+        HF_TOKEN: ${HF_TOKEN}
+        HF_HOME: /root/.cache/huggingface
+        TOKENIZERS_PARALLELISM: "false"
+
+    volumes:
+        - ./hf-cache:/root/.cache/huggingface
+
+    networks:
+        - preproc
+
+services:
+
+    # Agent 0: rubric preprocessing
+
+    qwen-3_8:
+        <<: *vllm-common
+        image: ${VLLM_IMAGE}
+        container_name: preproc-qwen-3_8
+
+        entrypoint: ["vllm", "serve"]
+
+        command:
+            - Qwen/Qwen3.8-27B
+            - --served-model-name
+            - rubric-preproc
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8000"
+            - --dtype
+            - auto
+            - --tensor-parallel-size
+            - "${TP_SIZE:-1}"
+            - --gpu-memory-utilization
+            - "0.90"
+            - --max-model-len
+            - "16384"
+            - --max-num-seqs
+            - "1"
+
+        ports:
+            - "127.0.0.1:8001:8000"
+
+networks:
+    preproc:
+        driver: bridge
