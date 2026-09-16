@@ -18,8 +18,7 @@ x-vllm-common: &vllm-common
 
 services:
 
-    # Agent 0: rubric preprocessing
-
+    # Agent 1: rubric preprocessing
     qwen-3_8:
         <<: *vllm-common
         image: ${VLLM_IMAGE}
@@ -40,14 +39,19 @@ services:
             - --tensor-parallel-size
             - "${TP_SIZE:-1}"
             - --gpu-memory-utilization
-            - "0.90"
+            - "0.85"
             - --max-model-len
-            - "16384"
+            - "32768"
             - --max-num-seqs
             - "1"
+            - --reasoning-parser
+            - qwen3
+            - --enforce-eager
+            - --limit-mm-per-prompt
+            - '{"image": 16}'
 
         ports:
-            - "127.0.0.1:8001:8000"
+            - "127.0.0.1:8000:8000"
 
 networks:
     preproc:
