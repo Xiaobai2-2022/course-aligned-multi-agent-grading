@@ -2,4 +2,6 @@
 
 hf-cache/
 
+.venv
+
 .env
