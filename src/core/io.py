@@ -1,9 +1,10 @@
 from pathlib import Path
-from typing import List, Optional, Union
-import pdf2image
-import base64
+from typing import List, Optional, Union, Any
 from io import BytesIO
 from PIL import Image
+import pdf2image
+import base64
+import json
 
 from .log import log_fail, log_info, log_success, log_warning
 
@@ -150,3 +151,50 @@ def image_to_messages(
         f"Built {len(messages)} messages containing {len(images)} page images"
     )
     return messages
+
+
+
+def write_json(
+    data: Any,
+    json_path: str | Path
+) -> Path:
+    """
+    Writes data to a json file
+
+    :param data: the data to write
+    :param json_path: the path to the json file
+    :return: the path to the json file
+    """
+
+    try:
+        if not isinstance(json_path, (str, Path)):
+            raise TypeError("json_path must be a string or Path.")
+
+        if isinstance(json_path, str) and not json_path.strip():
+            raise ValueError("json_path must not be empty.")
+
+        path = Path(json_path)
+
+        if path.is_dir():
+            raise IsADirectoryError(f"Output path is a directory: {path}")
+
+        log_info(f"Writing JSON: {path}")
+
+        content = json.dumps(
+            data,
+            indent=4,
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+
+        encoded = (content + "\n").encode("utf-8")
+
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(encoded)
+
+    except (TypeError, ValueError, OSError, RecursionError) as exc:
+        log_fail(f"Failed to write JSON to {json_path!r}: {exc}")
+        raise
+
+    log_success(f"JSON saved successfully: {path}")
+    return path
