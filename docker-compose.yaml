@@ -27,7 +27,7 @@ services:
         entrypoint: ["vllm", "serve"]
 
         command:
-            - Qwen/Qwen3.8-27B
+            - Qwen/Qwen3.8-27B-FP8
             - --served-model-name
             - preproc-rubric
             - --host
@@ -46,7 +46,6 @@ services:
             - "1"
             - --reasoning-parser
             - qwen3
-            - --enforce-eager
             - --limit-mm-per-prompt
             - '{"image": 16}'
 
