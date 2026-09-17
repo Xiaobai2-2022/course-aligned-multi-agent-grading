@@ -1,0 +1,19 @@
+version = 1
+revision = 3
+requires-python = ">=3.12"
+
+[manifest]
+members = [
+    "core",
+    "preproc-rubric",
+]
+
+[[package]]
+name = "core"
+version = "0.1.0"
+source = { editable = "." }
+
+[[package]]
+name = "preproc-rubric"
+version = "0.1.0"
+source = { editable = "preproc-rubric" }
