@@ -29,7 +29,7 @@ services:
         command:
             - Qwen/Qwen3.8-27B
             - --served-model-name
-            - rubric-preproc
+            - preproc-rubric
             - --host
             - "0.0.0.0"
             - --port
