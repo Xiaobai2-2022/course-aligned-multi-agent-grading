@@ -7,7 +7,10 @@ authors = [
     { name = "Xiaobai2-2026", email = "z2367li@uwaterloo.ca" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "pdf2image>=1.17.0",
+    "pillow>=12.3.0",
+]
 
 [project.scripts]
 core = "core:main"
