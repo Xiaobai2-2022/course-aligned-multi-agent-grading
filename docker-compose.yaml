@@ -39,9 +39,9 @@ services:
             - --tensor-parallel-size
             - "${TP_SIZE:-1}"
             - --gpu-memory-utilization
-            - "0.85"
+            - "0.90"
             - --max-model-len
-            - "32768"
+            - "65536"
             - --max-num-seqs
             - "1"
             - --reasoning-parser
