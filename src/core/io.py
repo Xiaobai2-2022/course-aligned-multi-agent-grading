@@ -1,10 +1,8 @@
-
-"""Prompt and PDF helpers using the custom logger in this package's log.py."""
-
 from pathlib import Path
 from typing import List, Optional, Union
-
 import pdf2image
+import base64
+from io import BytesIO
 from PIL import Image
 
 from .log import log_fail, log_info, log_success, log_warning
@@ -116,16 +114,32 @@ def image_to_messages(
     log_info(f"Building LLM messages from {len(images)} page images")
 
     if not images:
-        log_warning("No page images supplied; the user message will be empty.")
+        log_fail("No page images supplied.")
+        raise ValueError("At least one page image is required.")
+
     if not prompt.strip():
         log_warning("The system prompt is empty or contains only whitespace.")
 
     content = []
+
     for page_number, img in enumerate(images, start=1):
-        content.extend([
-            {"type": "text", "text": f"Page {page_number}"},
-            {"type": "image", "image": img},
-        ])
+        try:
+            with BytesIO() as buffer:
+                img.convert("RGB").save(buffer, format="PNG")
+                encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+
+            content.extend([
+                {"type": "text", "text": f"Page {page_number}"},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{encoded}",
+                    },
+                },
+            ])
+        except Exception as exc:
+            log_fail(f"Failed to encode page {page_number}: {exc}")
+            raise
 
     messages = [
         {"role": "system", "content": prompt},
