@@ -159,11 +159,11 @@ def write_json(
     json_path: str | Path
 ) -> Path:
     """
-    Writes data to a json file
+    Writes data to a JSON file
 
     :param data: the data to write
-    :param json_path: the path to the json file
-    :return: the path to the json file
+    :param json_path: the path to the JSON file
+    :return: the path to the JSON file
     """
 
     try:
@@ -198,3 +198,33 @@ def write_json(
 
     log_success(f"JSON saved successfully: {path}")
     return path
+
+
+
+def read_json(json_path: str | Path) -> dict:
+    """
+    Read a JSON file with double encoded JSON format
+
+    :param json_path: the path to the JSON file
+    :return: the given packet
+    """
+    path = Path(json_path)
+    log_info(f"Reading JSON: {path}")
+
+    try:
+        with path.open("r", encoding="utf-8") as file:
+            rubric = json.load(file)
+
+        if isinstance(rubric, str):
+            log_warning("Double-encoded JSON detected; decoding once more.")
+            rubric = json.loads(rubric)
+
+        if not isinstance(rubric, dict):
+            raise ValueError("The JSON root must be an object.")
+
+    except (OSError, UnicodeError, ValueError) as exc:
+        log_fail(f"Failed to read JSON '{path}': {exc}")
+        raise
+
+    log_success("JSON loaded successfully.")
+    return rubric
