@@ -27,7 +27,7 @@ services:
         entrypoint: ["vllm", "serve"]
 
         command:
-            - Qwen/Qwen3.8-27B-FP8
+            - Inferact/Qwen3.8-27B-NVFP4
             - --served-model-name
             - preproc-rubric
             - --host
@@ -35,13 +35,15 @@ services:
             - --port
             - "8000"
             - --dtype
-            - auto
+            - bfloat16
+            - --kv-cache-dtype
+            - bfloat16
             - --tensor-parallel-size
             - "${TP_SIZE:-1}"
             - --gpu-memory-utilization
             - "0.90"
             - --max-model-len
-            - "65536"
+            - "262144"
             - --max-num-seqs
             - "1"
             - --reasoning-parser

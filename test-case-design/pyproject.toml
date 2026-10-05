@@ -1,5 +1,5 @@
 [project]
-name = "core"
+name = "test-case-design"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -8,25 +8,15 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "ipykernel>=7.3.0",
-    "pdf2image>=1.17.0",
-    "pillow>=12.3.0",
-    "requests>=2.34.2",
-    "typing-extensions>=4.16.0",
+    "core",
 ]
 
 [project.scripts]
-core = "core:main"
+test-case-design = "test_case_design:main"
 
 [build-system]
 requires = ["uv_build>=0.12.15,<0.13.0"]
 build-backend = "uv_build"
 
-[tool.uv.build-backend]
-module-name = "core"
-
-[tool.uv.workspace]
-members = [
-    "preproc-rubric",
-    "test-case-design",
-]
+[tool.uv.sources]
+core = { workspace = true }

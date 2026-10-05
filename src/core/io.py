@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Optional, Union, Any
 from io import BytesIO
 from PIL import Image
+from typing_extensions import deprecated
 import pdf2image
 import base64
 import json
@@ -9,6 +10,7 @@ import json
 from .log import log_fail, log_info, log_success, log_warning
 
 
+@deprecated("read_prompt is deprecated, please use read_file instead.")
 def read_prompt(
         prompt_path: Union[str, Path]
 ) -> str:
@@ -18,6 +20,8 @@ def read_prompt(
     :param prompt_path: The path to the prompt file
     :return: The prompt content
     """
+
+    log_warning("This function is deprecated. Please use read_file instead.")
 
     path = Path(prompt_path)
     log_info(f"Reading prompt: {path}")
@@ -35,6 +39,35 @@ def read_prompt(
 
     log_success(f"Prompt loaded successfully: {len(prompt)} characters")
     return prompt
+
+
+
+def read_file(
+        file_path: Union[str, Path]
+) -> str:
+    """
+    Read a file and return its content
+
+    :param file_path: The path to file
+    :return: File content
+    """
+
+    path = Path(file_path)
+    log_info(f"Reading file: {path}")
+
+    try:
+        if not path.is_file():
+            raise FileNotFoundError(f"File '{path}' not found.")
+
+        content = path.read_text(encoding="utf-8").strip()
+        if not content:
+            raise ValueError(f"File '{path}' is empty.")
+    except (OSError, UnicodeError, ValueError) as exc:
+        log_fail(f"Failed to read file '{path}': {exc}")
+        raise
+
+    log_success(f"File loaded successfully: {len(content)} characters")
+    return content
 
 
 
@@ -156,16 +189,13 @@ def image_to_messages(
 
 def write_json(
     data: Any,
-    json_path: str | Path
+    json_path: str | Path,
 ) -> Path:
     """
-    Writes data to a JSON file
+    Write a JSON object to a UTF-8 file.
 
-    :param data: the data to write
-    :param json_path: the path to the JSON file
-    :return: the path to the JSON file
+    Accepts a dictionary or a JSON string representing an object.
     """
-
     try:
         if not isinstance(json_path, (str, Path)):
             raise TypeError("json_path must be a string or Path.")
@@ -178,7 +208,23 @@ def write_json(
         if path.is_dir():
             raise IsADirectoryError(f"Output path is a directory: {path}")
 
-        log_info(f"Writing JSON: {path}")
+        if isinstance(data, str):
+            if not data.strip():
+                raise ValueError("JSON response must not be empty.")
+
+            try:
+                data = json.loads(data)
+            except json.JSONDecodeError as exc:
+                raise ValueError(
+                    f"Invalid JSON at line {exc.lineno}, "
+                    f"column {exc.colno}: {exc.msg}"
+                ) from exc
+
+        if not isinstance(data, dict):
+            raise TypeError(
+                "JSON root must be an object (dict), "
+                f"but received {type(data).__name__}."
+            )
 
         content = json.dumps(
             data,
@@ -187,10 +233,10 @@ def write_json(
             allow_nan=False,
         )
 
-        encoded = (content + "\n").encode("utf-8")
+        log_info(f"Writing JSON: {path}")
 
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(encoded)
+        path.write_bytes((content + "\n").encode("utf-8"))
 
     except (TypeError, ValueError, OSError, RecursionError) as exc:
         log_fail(f"Failed to write JSON to {json_path!r}: {exc}")
