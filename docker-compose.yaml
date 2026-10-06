@@ -1,4 +1,4 @@
-name: rubric-preproc
+name: course-aligned-multi-agent-grading
 
 x-vllm-common: &vllm-common
     restart: unless-stopped
@@ -14,22 +14,22 @@ x-vllm-common: &vllm-common
         - ./hf-cache:/root/.cache/huggingface
 
     networks:
-        - preproc
+        - test-design
 
 services:
 
-    # Agent 1: rubric preprocessing
+    # Agent 1: test-case-design
     qwen-3_8:
         <<: *vllm-common
         image: ${VLLM_IMAGE}
-        container_name: preproc-qwen-3_8
+        container_name: test-design-qwen-3_8
 
         entrypoint: ["vllm", "serve"]
 
         command:
             - Inferact/Qwen3.8-27B-NVFP4
             - --served-model-name
-            - preproc-rubric
+            - test-design
             - --host
             - "0.0.0.0"
             - --port
@@ -54,6 +54,30 @@ services:
         ports:
             - "127.0.0.1:8000:8000"
 
+    postgres:
+        image: postgres:18
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: app_db
+        ports:
+            - "127.0.0.1:5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql
+        networks:
+            - test-design
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready -U postgres -d app_db" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 30s
+        stop_grace_period: 60s
+
 networks:
-    preproc:
+    test-design:
         driver: bridge
+
+volumes:
+  postgres_data:

@@ -143,7 +143,7 @@ def run_qwen3_8(
 
     return run_llm(
         messages=messages,
-        model="preproc-rubric",
+        model="test-design",
         base_url="http://localhost:8000",
         temperature=temperature,
         max_tokens=max_tokens

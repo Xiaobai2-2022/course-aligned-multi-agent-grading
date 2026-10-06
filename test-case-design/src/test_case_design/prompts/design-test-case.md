@@ -90,26 +90,26 @@ Derive testing dimensions from the programming question and its supported requir
 
 The following table is illustrative only. It is not a fixed taxonomy, an exhaustive list, or a required checklist. You do not need to include every example or classify new dimensions under `other`:
 
-| Category             | Meaning                                                                                   |
-| -------------------- |-------------------------------------------------------------------------------------------|
-| compilation          | Failure to compile under the required configuration.                                      |
-| submission_structure | Missing or incompatible required files, entry points, signatures, or interfaces.          |
-| input_parsing        | Incorrect input order, format, or representation.                                         |
-| input_validation     | Accepted or rejected values violate the stated input contract.                            |
-| state_preservation   | Previously accepted or computed values are unintentionally lost or changed.               |
-| initialization       | Initial values violate stated requirements.                                               |
-| algorithm_compliance | An explicitly required method is not followed.                                            |
-| control_flow         | Branching or execution order violates required behavior.                                  |
-| termination          | Execution fails to stop or stops at an incorrect point.                                   |
-| boundary_condition   | Equality cases, range endpoints, or other boundaries are mishandled.                      |
-| special_case         | An explicitly defined exceptional case is mishandled.                                     |
-| numerical_precision  | Arithmetic types, conversions, rounding, or precision affect correctness.                 |
-| result_correctness   | Results disagree with required behavior without establishing an internal cause.           |
+| Category             | Meaning                                                      |
+| -------------------- | ------------------------------------------------------------ |
+| compilation          | Failure to compile under the required configuration.         |
+| submission_structure | Missing or incompatible required files, entry points, signatures, or interfaces. |
+| input_parsing        | Incorrect input order, format, or representation.            |
+| input_validation     | Accepted or rejected values violate the stated input contract. |
+| state_preservation   | Previously accepted or computed values are unintentionally lost or changed. |
+| initialization       | Initial values violate stated requirements.                  |
+| algorithm_compliance | An explicitly required method is not followed.               |
+| control_flow         | Branching or execution order violates required behavior.     |
+| termination          | Execution fails to stop or stops at an incorrect point.      |
+| boundary_condition   | Equality cases, range endpoints, or other boundaries are mishandled. |
+| special_case         | An explicitly defined exceptional case is mishandled.        |
+| numerical_precision  | Arithmetic types, conversions, rounding, or precision affect correctness. |
+| result_correctness   | Results disagree with required behavior without establishing an internal cause. |
 | output_format        | Labels, spacing, line endings, ordering, precision, or extra output violate the contract. |
-| source_restriction   | An explicit restriction on language features, libraries, or constructs is violated.       |
-| resource_usage       | A stated time, memory, or other resource requirement is not met.                          |
-| robustness           | Behavior fails under conditions explicitly included in assessment scope.                  |
-| other                | A source-supported concern does not fit the existing categories.                          |
+| source_restriction   | An explicit restriction on language features, libraries, or constructs is violated. |
+| resource_usage       | A stated time, memory, or other resource requirement is not met. |
+| robustness           | Behavior fails under conditions explicitly included in assessment scope. |
+| other                | A source-supported concern does not fit the existing categories. |
 
 Return an entry for each dimension you identify containing:
 
@@ -353,7 +353,7 @@ Use these top-level fields:
 
 ```json
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "document": {
     "title": null,
     "course": null,
@@ -397,7 +397,7 @@ Use these top-level fields:
 
 This is a structural template, not a completed result. Populate it from the supplied material; determine `status`, `extraction_complete`, and `human_review_required` from the actual result rather than copying their initial values. The code fence is only for readability in this prompt: the produced response must contain the JSON object alone.
 
-- `schema_version` must be the string `"1.0"`.
+- `schema_version` must be the string `"1.1"`.
 - `document` must contain all six fields shown above. Use source-supported strings for `title`, `course`, and `assignment_name`, or null when unknown.
 - Document metadata describes the primary PQ. Record supporting-material metadata and reading status separately in `sources`.
 - `page_count` is the primary PQ's total page count, or null if unknown or not paginated. `pages_processed` is an array of unique 1-based page numbers actually read; use an empty array for unpaginated text. Do not invent page numbers.
@@ -440,7 +440,7 @@ Each coverage-matrix entry must distinguish planned ready coverage from blocked 
 
 1. Return exactly one top-level JSON object. The first non-whitespace character must be `{` and the last must be `}`.
 2. Do not return a top-level array, a quoted JSON string, multiple objects, JSON Lines, Markdown fences, or explanatory text before or after the object.
-3. Include all 16 top-level keys shown in the template above and no additional top-level keys, even for `partial` or `blocked` results.
+3. Include all 17 top-level keys shown in the template above and no additional top-level keys, even for `partial` or `blocked` results.
 4. Use objects for `document`, `question_analysis`, `testing_configuration`, and `test_suites`. Use arrays for `sources`, `requirements`, `testing_dimensions`, `prerequisite_checks`, `coverage_matrix`, `ambiguities`, `coverage_gaps`, `downstream_notes`, and `human_review_requests`. Use strings for `schema_version` and `status`, and a JSON boolean for `human_review_required`. Follow the nested document types specified above.
 5. Each of `public`, `release`, and `private` must remain an object containing a string `purpose`, an array `deterministic_tests`, and an array `randomized_test_families`, even when no tests can be produced.
 6. Use double-quoted property names and strings, unique property names within each object, and JSON literals `true`, `false`, and `null`. Do not use Python literals, comments, trailing commas, NaN, Infinity, or undefined.
@@ -455,3 +455,1042 @@ Use empty arrays for absent collections and null for absent optional scalar valu
 Before returning, check that all IDs and dimension names are unique, references resolve, every test category matches a declared testing dimension, every applicable dimension is supported by requirements, every test is supported by requirements, every ready test has a usable oracle or inspection criterion, all human-review references resolve, and no ready test depends on a pending blocking review.
 
 Do not fabricate additional tests merely to fill quotas, and do not claim the suite proves program correctness.
+
+## 10. PostgreSQL ingestion contract (version 1.1)
+
+Return the test specification as JSON data, never as SQL INSERT statements.
+The application validates and stores this complete object in a JSONB column.
+Do not add database IDs, question_id, timestamps, credentials, or model metadata.
+The application supplies question_id and model metadata; PostgreSQL generates the row UUID and timestamp.
+Local IDs such as PUB001 need be unique only inside this specification.
+Use all 17 top-level fields. The exact schema below governs record shapes and field types; Sections 1–9 govern test-design meaning.
+Assignment-specific payload fields accept objects, arrays, strings, or null; they are deliberately flexible and must remain precise enough to implement.
+Source references use source_id, location, and excerpt; at least location or excerpt must be nonempty.
+Coverage entries include requirement_id, test_ids, ready_test_ids, blocked_test_ids, and notes.
+Prerequisite records use PRE IDs and not_applicable difficulty. Suite tests use PUB, REL, or PRI prefixes; randomized families add -R.
+Every pending blocking review must block explicitly affected tests, tests mapped to its affected requirements/dimensions, and transitive dependents. Link that review ID to all such tests.
+Ready records must have null blocking_information and non-null usable oracle/assertion or inspection fields. Blocked records must explain what is missing.
+Store blocked and partial designs for review; storage does not approve a design for grading.
+Never escape content for SQL: preserve it as ordinary JSON data and apply only JSON escaping. Represent binary NUL as a symbolic value with a decoding rule, rather than a decoded U+0000 character, because PostgreSQL text/JSONB cannot store U+0000.
+Do not fabricate source evidence or resolved review decisions to satisfy validation.
+
+### Authoritative JSON Schema
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.1"
+    },
+    "document": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "course": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "assignment_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "page_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "pages_processed": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "uniqueItems": true
+        },
+        "extraction_complete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "title",
+        "course",
+        "assignment_name",
+        "page_count",
+        "pages_processed",
+        "extraction_complete"
+      ],
+      "additionalProperties": false
+    },
+    "status": {
+      "enum": [
+        "complete",
+        "partial",
+        "blocked"
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reading_status": {
+            "enum": [
+              "complete",
+              "partial",
+              "unreadable",
+              "missing"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "role",
+          "reading_status",
+          "notes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "question_analysis": {
+      "type": "object"
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_refs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "location": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "excerpt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "source_id",
+                "location",
+                "excerpt"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          },
+          "basis": {
+            "enum": [
+              "explicit",
+              "logically_implied"
+            ]
+          },
+          "implication_explanation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "verification_methods": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "build",
+                "structure_check",
+                "runtime",
+                "static_analysis",
+                "manual_review"
+              ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "id",
+          "description",
+          "source_refs",
+          "basis",
+          "implication_explanation",
+          "verification_methods"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "testing_dimensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "applicable",
+              "unclear"
+            ]
+          },
+          "requirement_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "scenarios": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "verification_methods": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "build",
+                "structure_check",
+                "runtime",
+                "static_analysis",
+                "manual_review"
+              ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "justification": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "category",
+          "description",
+          "status",
+          "requirement_ids",
+          "scenarios",
+          "verification_methods",
+          "justification"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "testing_configuration": {
+      "type": "object"
+    },
+    "prerequisite_checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/deterministic_test"
+      }
+    },
+    "test_suites": {
+      "type": "object",
+      "properties": {
+        "public": {
+          "$ref": "#/$defs/suite"
+        },
+        "release": {
+          "$ref": "#/$defs/suite"
+        },
+        "private": {
+          "$ref": "#/$defs/suite"
+        }
+      },
+      "required": [
+        "public",
+        "release",
+        "private"
+      ],
+      "additionalProperties": false
+    },
+    "coverage_matrix": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "requirement_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "test_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "ready_test_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "blocked_test_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "requirement_id",
+          "test_ids",
+          "ready_test_ids",
+          "blocked_test_ids",
+          "notes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "ambiguities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requirement_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "test_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "human_review_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "description",
+          "requirement_ids",
+          "test_ids",
+          "human_review_ids"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "coverage_gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requirement_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "test_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "human_review_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "description",
+          "requirement_ids",
+          "test_ids",
+          "human_review_ids"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "downstream_notes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "human_review_required": {
+      "type": "boolean"
+    },
+    "human_review_requests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "resolved"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_refs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "location": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "excerpt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "source_id",
+                "location",
+                "excerpt"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "affected_requirement_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "affected_test_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "affected_dimensions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "question_for_reviewer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "recommended_action": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "blocking": {
+            "type": "boolean"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "decision": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "source_id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "location": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "excerpt": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "source_id",
+                        "location",
+                        "excerpt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  },
+                  "changes": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "decision",
+                  "source_refs",
+                  "changes"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "reason",
+          "source_refs",
+          "affected_requirement_ids",
+          "affected_test_ids",
+          "affected_dimensions",
+          "question_for_reviewer",
+          "options",
+          "recommended_action",
+          "blocking",
+          "resolution"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "document",
+    "status",
+    "sources",
+    "question_analysis",
+    "requirements",
+    "testing_dimensions",
+    "testing_configuration",
+    "prerequisite_checks",
+    "test_suites",
+    "coverage_matrix",
+    "ambiguities",
+    "coverage_gaps",
+    "downstream_notes",
+    "human_review_required",
+    "human_review_requests"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "deterministic_test": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "suite": {
+          "enum": [
+            "prerequisite",
+            "public",
+            "release",
+            "private"
+          ]
+        },
+        "difficulty": {
+          "enum": [
+            "not_applicable",
+            "easy",
+            "medium",
+            "difficult"
+          ]
+        },
+        "requirement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "primary_category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "secondary_categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "difficulty_reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "readiness": {
+          "enum": [
+            "ready",
+            "blocked"
+          ]
+        },
+        "blocking_information": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "human_review_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "verification_methods": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "build",
+              "structure_check",
+              "runtime",
+              "static_analysis",
+              "manual_review"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "setup": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "input": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "expected_result": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "comparison_rule": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "oracle_basis": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "targeted_mistake": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "suite",
+        "difficulty",
+        "requirement_ids",
+        "primary_category",
+        "secondary_categories",
+        "purpose",
+        "difficulty_reason",
+        "readiness",
+        "blocking_information",
+        "human_review_ids",
+        "verification_methods",
+        "setup",
+        "input",
+        "expected_result",
+        "comparison_rule",
+        "oracle_basis",
+        "targeted_mistake",
+        "dependencies"
+      ],
+      "additionalProperties": false
+    },
+    "randomized_family": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "suite": {
+          "enum": [
+            "prerequisite",
+            "public",
+            "release",
+            "private"
+          ]
+        },
+        "difficulty": {
+          "enum": [
+            "not_applicable",
+            "easy",
+            "medium",
+            "difficult"
+          ]
+        },
+        "requirement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "primary_category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "secondary_categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "difficulty_reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "readiness": {
+          "enum": [
+            "ready",
+            "blocked"
+          ]
+        },
+        "blocking_information": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "human_review_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "generated_variables": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "valid_domain": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "generation_strategy": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "variable_dependencies": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "sampling_parameters": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "seed_policy": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "oracle": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "assertions": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "state_setup_and_reset": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "failure_record": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "targeted_mistakes": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "null"
+          ]
+        },
+        "case_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "suite",
+        "difficulty",
+        "requirement_ids",
+        "primary_category",
+        "secondary_categories",
+        "purpose",
+        "difficulty_reason",
+        "readiness",
+        "blocking_information",
+        "human_review_ids",
+        "generated_variables",
+        "valid_domain",
+        "generation_strategy",
+        "variable_dependencies",
+        "sampling_parameters",
+        "seed_policy",
+        "oracle",
+        "assertions",
+        "state_setup_and_reset",
+        "failure_record",
+        "targeted_mistakes",
+        "case_count"
+      ],
+      "additionalProperties": false
+    },
+    "suite": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "deterministic_tests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/deterministic_test"
+          }
+        },
+        "randomized_test_families": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/randomized_family"
+          }
+        }
+      },
+      "required": [
+        "purpose",
+        "deterministic_tests",
+        "randomized_test_families"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
+```

@@ -1,5 +1,5 @@
 {
-    "schema_version": "1.0",
+    "schema_version": "1.1",
     "document": {
         "title": "Square Root Function",
         "course": null,
@@ -11,47 +11,49 @@
     "status": "partial",
     "sources": [
         {
-            "source_id": "S1",
+            "id": "S1",
             "name": "Square Root Function programming question",
-            "role": "primary",
-            "reading_status": "read",
-            "pages_processed": [],
-            "extraction_complete": true
+            "role": "primary question",
+            "reading_status": "complete",
+            "notes": null
         }
     ],
     "question_analysis": {
-        "program_purpose": "Implement a C++ function that approximates the square root of a nonnegative number using Newton's method.",
-        "required_files": "A C++ source file containing the required function and only permitted include directives; any main function is to be removed before testing.",
-        "entry_points": "double square_root(double n, double s, double e);",
-        "input_representation": "Three double parameters: n, s, and e.",
-        "outputs": "Return a double approximation; return -1.0 for invalid parameters; display an error message for invalid parameters; do not display successful results.",
-        "initialization": "For valid n > 0, initialize x0 = s.",
-        "state": "The function is not stateful; each call is independent.",
-        "algorithms": "Newton iteration x_{k+1} = 1/2 * (x_k + n / x_k), stopping at the first update with |x_{k+1} - x_k| <= e.",
-        "restrictions": "Only <iostream>, <iomanip>, <cmath>, and <cassert> may be included; Newton's method must be implemented manually; std::sqrt or another library operation may not replace Newton's method; no input reading or successful result display; no main function.",
-        "numerical_accuracy": "The assignment specifies the stopping tolerance e but does not specify a final output comparison tolerance.",
-        "resource_requirements": "No explicit time or memory limits are stated.",
-        "ambiguities": "Error message location/verification, verification of no Newton updates, comparison tolerance for valid Newton outputs, and the scope of 'another library operation' are unresolved."
+        "purpose": "Implement a C++ function that approximates the square root of a nonnegative number using Newton's method.",
+        "interface": "double square_root(double n, double s, double e);",
+        "inputs": "n must be finite and nonnegative; s must be finite and positive; e must be finite and positive. NaN and infinities are invalid.",
+        "outputs": "Return -1.0 after displaying an error message for invalid parameters; return 0.0 for valid n=0; otherwise return the first Newton approximation satisfying the consecutive-difference stopping tolerance.",
+        "state": "No persistent state is required. The function must not read input or display successful results.",
+        "restrictions": "Only <iostream>, <iomanip>, <cmath>, and <cassert> may be included; Newton's method must be implemented; std::sqrt or another library square-root operation must not replace Newton's method; no main function after assessment removal.",
+        "ambiguities": "No grader comparison tolerance or exact C++ expression is specified for non-exact floating-point results; error message stream/wording is unspecified; internal no-update behavior is not fully observable from runtime output."
     },
     "requirements": [
         {
             "id": "REQ001",
             "description": "The function must have signature double square_root(double n, double s, double e).",
             "source_refs": [
-                "S1: function signature"
+                {
+                    "source_id": "S1",
+                    "location": "Signature",
+                    "excerpt": "double square_root(double n, double s, double e);"
+                }
             ],
             "basis": "explicit",
             "implication_explanation": null,
             "verification_methods": [
-                "build",
-                "structure_check"
+                "structure_check",
+                "build"
             ]
         },
         {
             "id": "REQ002",
-            "description": "Valid parameters satisfy n >= 0, s > 0, and e > 0.",
+            "description": "All three parameters must be finite numeric values satisfying n >= 0, s > 0, and e > 0; NaN and positive or negative infinity are invalid.",
             "source_refs": [
-                "S1: parameters"
+                {
+                    "source_id": "S1",
+                    "location": "Parameter validation",
+                    "excerpt": "All three parameters must be finite numeric values satisfying their stated constraints. NaN and positive or negative infinity are invalid."
+                }
             ],
             "basis": "explicit",
             "implication_explanation": null,
@@ -61,21 +63,30 @@
         },
         {
             "id": "REQ003",
-            "description": "All three parameters must be finite; NaN and positive or negative infinity are invalid.",
+            "description": "If any parameter is invalid, display an error message and return -1.0 without performing any Newton updates.",
             "source_refs": [
-                "S1: Parameter validation"
+                {
+                    "source_id": "S1",
+                    "location": "Parameter validation",
+                    "excerpt": "If any parameter is invalid, display an error message and return -1.0 without performing any Newton updates."
+                }
             ],
             "basis": "explicit",
             "implication_explanation": null,
             "verification_methods": [
-                "runtime"
+                "runtime",
+                "manual_review"
             ]
         },
         {
             "id": "REQ004",
-            "description": "If any parameter is invalid, the function returns -1.0.",
+            "description": "Validate all three parameters before handling n = 0.",
             "source_refs": [
-                "S1: Parameter validation"
+                {
+                    "source_id": "S1",
+                    "location": "Parameter validation",
+                    "excerpt": "Validate all three parameters before handling n = 0."
+                }
             ],
             "basis": "explicit",
             "implication_explanation": null,
@@ -85,35 +96,45 @@
         },
         {
             "id": "REQ005",
-            "description": "If any parameter is invalid, the function displays an error message.",
+            "description": "If the parameters are valid and n = 0, return 0.0 without performing any Newton updates.",
             "source_refs": [
-                "S1: Parameter validation"
+                {
+                    "source_id": "S1",
+                    "location": "Calculation",
+                    "excerpt": "If the parameters are valid and n = 0, return 0.0 without performing any Newton updates."
+                }
             ],
             "basis": "explicit",
             "implication_explanation": null,
             "verification_methods": [
-                "runtime",
-                "manual_review"
+                "runtime"
             ]
         },
         {
             "id": "REQ006",
-            "description": "If any parameter is invalid, the function performs no Newton updates.",
+            "description": "For valid n > 0, initialize x0 = s and repeatedly calculate x_{k+1} = 1/2(x_k + n/x_k).",
             "source_refs": [
-                "S1: Parameter validation"
+                {
+                    "source_id": "S1",
+                    "location": "Calculation",
+                    "excerpt": "initialize x_0 = s and repeatedly calculate: x_{k+1} = 1/2(x_k + n/x_k)."
+                }
             ],
             "basis": "explicit",
             "implication_explanation": null,
             "verification_methods": [
-                "manual_review",
-                "static_analysis"
+                "runtime"
             ]
         },
         {
             "id": "REQ007",
-            "description": "All three parameters must be validated before handling n = 0.",
+            "description": "Stop at the first update satisfying |x_{k+1} - x_k| <= e and return the new approximation x_{k+1}, not the previous value x_k.",
             "source_refs": [
-                "S1: Parameter validation"
+                {
+                    "source_id": "S1",
+                    "location": "Calculation",
+                    "excerpt": "Stop at the first update satisfying: |x_{k+1} - x_k| <= e. Return the new approximation, x_{k+1}, rather than the previous value, x_k."
+                }
             ],
             "basis": "explicit",
             "implication_explanation": null,
@@ -123,95 +144,29 @@
         },
         {
             "id": "REQ008",
-            "description": "If parameters are valid and n = 0, return 0.0 without performing any Newton updates.",
+            "description": "The tolerance e applies to the difference between consecutive approximations; the stopping condition must not be replaced by a different criterion.",
             "source_refs": [
-                "S1: Calculation"
+                {
+                    "source_id": "S1",
+                    "location": "Calculation",
+                    "excerpt": "The tolerance e applies to the difference between consecutive approximations. Do not replace this condition with a different stopping criterion."
+                }
             ],
             "basis": "explicit",
             "implication_explanation": null,
             "verification_methods": [
-                "runtime",
-                "manual_review"
+                "runtime"
             ]
         },
         {
             "id": "REQ009",
-            "description": "For valid n > 0, initialize x0 = s and repeatedly calculate x_{k+1} = 1/2 * (x_k + n / x_k).",
+            "description": "The submission may include only <iostream>, <iomanip>, <cmath>, and <cassert>.",
             "source_refs": [
-                "S1: Calculation"
-            ],
-            "basis": "explicit",
-            "implication_explanation": null,
-            "verification_methods": [
-                "runtime"
-            ]
-        },
-        {
-            "id": "REQ010",
-            "description": "Stop at the first update satisfying |x_{k+1} - x_k| <= e.",
-            "source_refs": [
-                "S1: Calculation"
-            ],
-            "basis": "explicit",
-            "implication_explanation": null,
-            "verification_methods": [
-                "runtime"
-            ]
-        },
-        {
-            "id": "REQ011",
-            "description": "Return the new approximation x_{k+1}, not the previous value x_k.",
-            "source_refs": [
-                "S1: Calculation"
-            ],
-            "basis": "explicit",
-            "implication_explanation": null,
-            "verification_methods": [
-                "runtime"
-            ]
-        },
-        {
-            "id": "REQ012",
-            "description": "The tolerance e applies to the difference between consecutive approximations; the stopping criterion must not be replaced.",
-            "source_refs": [
-                "S1: Calculation"
-            ],
-            "basis": "explicit",
-            "implication_explanation": null,
-            "verification_methods": [
-                "runtime"
-            ]
-        },
-        {
-            "id": "REQ013",
-            "description": "Only <iostream>, <iomanip>, <cmath>, and <cassert> may be included.",
-            "source_refs": [
-                "S1: Restrictions 1"
-            ],
-            "basis": "explicit",
-            "implication_explanation": null,
-            "verification_methods": [
-                "static_analysis"
-            ]
-        },
-        {
-            "id": "REQ014",
-            "description": "Newton's method must be implemented by the student.",
-            "source_refs": [
-                "S1: Restrictions 2"
-            ],
-            "basis": "explicit",
-            "implication_explanation": null,
-            "verification_methods": [
-                "manual_review",
-                "static_analysis"
-            ]
-        },
-        {
-            "id": "REQ015",
-            "description": "std::sqrt or another library operation may not be used to compute the square root in place of Newton's method.",
-            "source_refs": [
-                "S1: Restrictions 3"
+                {
+                    "source_id": "S1",
+                    "location": "Restrictions",
+                    "excerpt": "You may include only <iostream>, <iomanip>, <cmath>, and <cassert>."
+                }
             ],
             "basis": "explicit",
             "implication_explanation": null,
@@ -221,70 +176,92 @@
             ]
         },
         {
-            "id": "REQ016",
-            "description": "The function must not read input or display successful results.",
+            "id": "REQ010",
+            "description": "The implementation must implement Newton's method itself and must not use std::sqrt or another library operation to compute the square root in place of Newton's method.",
             "source_refs": [
-                "S1: Restrictions 4"
+                {
+                    "source_id": "S1",
+                    "location": "Restrictions",
+                    "excerpt": "You must implement Newton’s method yourself. You must not use std::sqrt or another library operation to compute the square root in place of Newton’s method."
+                }
+            ],
+            "basis": "explicit",
+            "implication_explanation": null,
+            "verification_methods": [
+                "static_analysis",
+                "manual_review"
+            ]
+        },
+        {
+            "id": "REQ011",
+            "description": "The function must not read input or display successful results; values are supplied through parameters and the approximation is returned to the caller.",
+            "source_refs": [
+                {
+                    "source_id": "S1",
+                    "location": "Restrictions",
+                    "excerpt": "The function must not read input or display successful results. Values are supplied through its parameters, and the approximation is returned to the caller."
+                }
             ],
             "basis": "explicit",
             "implication_explanation": null,
             "verification_methods": [
                 "runtime",
-                "static_analysis"
+                "manual_review"
             ]
         },
         {
-            "id": "REQ017",
-            "description": "Only the function and permitted include directives are submitted; any main function will be removed.",
+            "id": "REQ012",
+            "description": "The submission should contain only the function and permitted include directives; no main function should be submitted, and any main function will be removed by assessment preprocessing.",
             "source_refs": [
-                "S1: Restrictions 5"
+                {
+                    "source_id": "S1",
+                    "location": "Restrictions",
+                    "excerpt": "Submit only the function and any permitted include directives; do not submit a main function, any main function will be removed."
+                }
             ],
             "basis": "explicit",
             "implication_explanation": null,
             "verification_methods": [
-                "structure_check",
-                "static_analysis"
+                "structure_check"
             ]
         }
     ],
     "testing_dimensions": [
         {
             "category": "compilation",
-            "description": "Whether the submission compiles under the required configuration after main removal and harness addition.",
+            "description": "Whether the submission compiles under the required C++ configuration with the specified function interface.",
             "status": "applicable",
             "requirement_ids": [
-                "REQ001",
-                "REQ013"
+                "REQ001"
             ],
             "scenarios": [
-                "Submission compiles with a harness that calls square_root."
+                "Build the submission with a harness that calls square_root."
             ],
             "verification_methods": [
                 "build"
             ],
-            "justification": "A function-based assignment must compile before runtime behavior can be assessed."
+            "justification": "A non-compiling submission cannot be evaluated."
         },
         {
             "category": "submission_structure",
-            "description": "Whether the required function signature is present and the submission conforms to the no-main preprocessing rule.",
+            "description": "Whether the required function signature is present after assessment preprocessing removes any main function.",
             "status": "applicable",
             "requirement_ids": [
                 "REQ001",
-                "REQ017"
+                "REQ012"
             ],
             "scenarios": [
-                "Function signature is present.",
-                "No main remains after preprocessing."
+                "Inspect the source after main removal for the required signature."
             ],
             "verification_methods": [
                 "structure_check",
-                "static_analysis"
+                "build"
             ],
-            "justification": "The assignment specifies a function signature and a main-removal rule."
+            "justification": "The assignment specifies a function interface and main removal preprocessing."
         },
         {
             "category": "input_validation",
-            "description": "Whether invalid parameter values are rejected with -1.0 according to the stated constraints and finiteness rules.",
+            "description": "Whether invalid parameters are rejected according to the finite and constraint rules, including validation before n = 0.",
             "status": "applicable",
             "requirement_ids": [
                 "REQ002",
@@ -292,199 +269,191 @@
                 "REQ004"
             ],
             "scenarios": [
-                "n < 0, s <= 0, e <= 0, NaN, or infinity are rejected."
+                "Negative n, nonpositive s, nonpositive e, NaN, infinity, and invalid parameters with n = 0."
             ],
             "verification_methods": [
                 "runtime"
             ],
-            "justification": "The assignment explicitly defines valid and invalid parameter domains."
+            "justification": "The assignment explicitly defines invalid parameter handling."
         },
         {
             "category": "special_case",
-            "description": "Whether n = 0 is handled correctly after validation and without Newton updates.",
+            "description": "Whether valid n = 0 is handled as a special case returning 0.0.",
+            "status": "applicable",
+            "requirement_ids": [
+                "REQ005"
+            ],
+            "scenarios": [
+                "Valid n = 0 with various positive finite s and e."
+            ],
+            "verification_methods": [
+                "runtime"
+            ],
+            "justification": "The assignment explicitly defines n = 0 behavior."
+        },
+        {
+            "category": "algorithm_compliance",
+            "description": "Whether Newton's method is implemented rather than a library square-root operation.",
+            "status": "applicable",
+            "requirement_ids": [
+                "REQ006",
+                "REQ010"
+            ],
+            "scenarios": [
+                "Runtime behavior consistent with Newton iteration; source inspection for prohibited sqrt usage."
+            ],
+            "verification_methods": [
+                "runtime",
+                "static_analysis",
+                "manual_review"
+            ],
+            "justification": "The assignment requires Newton's method and prohibits library square-root replacement."
+        },
+        {
+            "category": "control_flow",
+            "description": "Whether the function stops at the first update satisfying the consecutive-difference tolerance and returns the new approximation.",
             "status": "applicable",
             "requirement_ids": [
                 "REQ007",
                 "REQ008"
             ],
             "scenarios": [
-                "Valid n = 0 returns 0.0.",
-                "Invalid parameters with n = 0 return -1.0."
-            ],
-            "verification_methods": [
-                "runtime",
-                "manual_review"
-            ],
-            "justification": "The assignment explicitly defines n = 0 as a special case."
-        },
-        {
-            "category": "algorithm_compliance",
-            "description": "Whether the implementation follows Newton's method and the specified stopping criterion.",
-            "status": "applicable",
-            "requirement_ids": [
-                "REQ009",
-                "REQ010",
-                "REQ011",
-                "REQ012",
-                "REQ014"
-            ],
-            "scenarios": [
-                "Correct iteration formula.",
-                "First update satisfying tolerance is returned.",
-                "New approximation is returned."
-            ],
-            "verification_methods": [
-                "runtime",
-                "manual_review"
-            ],
-            "justification": "The assignment requires Newton's method and a specific stopping rule."
-        },
-        {
-            "category": "result_correctness",
-            "description": "Whether returned values agree with the specified Newton behavior.",
-            "status": "applicable",
-            "requirement_ids": [
-                "REQ009",
-                "REQ010",
-                "REQ011",
-                "REQ012"
-            ],
-            "scenarios": [
-                "Returned value matches an independent Newton reference or exact expected value."
+                "Boundary equality for e, first-update stopping, return new value, and distinction from residual-based stopping."
             ],
             "verification_methods": [
                 "runtime"
             ],
-            "justification": "The function's return value is the primary observable output."
+            "justification": "The assignment explicitly defines the stopping condition and returned value."
         },
         {
             "category": "numerical_precision",
-            "description": "Whether double arithmetic, finiteness, and comparison policy are handled consistently with the specification.",
+            "description": "Whether finite, NaN, infinity, and floating-point comparison behavior are handled correctly.",
             "status": "applicable",
             "requirement_ids": [
-                "REQ003",
-                "REQ009",
-                "REQ010",
-                "REQ011"
+                "REQ002",
+                "REQ006",
+                "REQ007"
             ],
             "scenarios": [
-                "Finite inputs produce finite results.",
-                "Comparison policy for valid Newton outputs is defensible."
+                "NaN and infinity rejection, exact dyadic results, and non-exact multiple-update results."
             ],
             "verification_methods": [
                 "runtime"
             ],
-            "justification": "The assignment uses double arithmetic and a tolerance condition."
+            "justification": "The assignment involves double arithmetic and finite-value validation."
         },
         {
-            "category": "output_behavior",
-            "description": "Whether error messages are produced for invalid parameters and successful results are not displayed.",
+            "category": "output_contract",
+            "description": "Whether invalid parameters produce an error message and successful results are not displayed.",
             "status": "applicable",
             "requirement_ids": [
-                "REQ005",
-                "REQ016"
+                "REQ003",
+                "REQ011"
             ],
             "scenarios": [
-                "Invalid call produces an error message.",
-                "Valid call produces no successful output."
+                "Invalid call produces non-empty output; valid call produces no successful output."
             ],
             "verification_methods": [
                 "runtime",
                 "manual_review"
             ],
-            "justification": "The assignment specifies error display and prohibits successful result display."
+            "justification": "The assignment requires error display and prohibits successful result display."
         },
         {
             "category": "source_restriction",
-            "description": "Whether the source obeys include, implementation, library, input, and main restrictions.",
+            "description": "Whether only permitted include directives are used.",
             "status": "applicable",
             "requirement_ids": [
-                "REQ013",
-                "REQ014",
-                "REQ015",
-                "REQ016",
-                "REQ017"
+                "REQ009"
             ],
             "scenarios": [
-                "Only allowed includes are present.",
-                "No std::sqrt or other library root operation is used.",
-                "No main remains after preprocessing.",
-                "No input reading occurs."
+                "Inspect include directives for disallowed headers."
             ],
             "verification_methods": [
                 "static_analysis",
                 "manual_review"
             ],
-            "justification": "The assignment contains explicit source-level restrictions."
+            "justification": "The assignment explicitly restricts includes."
+        },
+        {
+            "category": "result_correctness",
+            "description": "Whether the returned value matches the required Newton sequence and stopping rule.",
+            "status": "applicable",
+            "requirement_ids": [
+                "REQ006",
+                "REQ007"
+            ],
+            "scenarios": [
+                "Exact one-update cases, boundary cases, and multiple-update cases."
+            ],
+            "verification_methods": [
+                "runtime"
+            ],
+            "justification": "The assignment defines the returned approximation."
         }
     ],
     "testing_configuration": {
-        "preprocessing": "Remove any main function before testing, as stated in the assignment.",
-        "harness": "Provide a harness main that calls square_root and captures return values and output.",
-        "seeds": "Proposed default seed 12345 for randomized families; this is testing configuration, not an assignment requirement.",
-        "case_counts": "Proposed 20 to 30 cases per randomized family; this is testing configuration, not an assignment requirement.",
-        "comparison_policy": "Exact equality is used for -1.0 and 0.0. Valid Newton outputs are pending HR001.",
-        "safety_timeout": "Proposed 1 second per case; exceeding it requires investigation and is not automatically a resource-contract violation.",
-        "floating_point_serialization": "Use round-trip decimal or hexadecimal serialization for generated doubles; represent NaN and infinity symbolically in JSON."
+        "language": "C++ (standard unspecified; proposed C++17 for harness compilation).",
+        "preprocessing": "Any main function is removed by assessment before testing; tests assess behavior after removal.",
+        "comparison_policy": "Exact equality is used for -1.0, 0.0, and exactly representable dyadic expected values. Non-exact Newton results are blocked pending HR001.",
+        "output_capture": "Capture stdout and stderr for error-message and no-success-output tests.",
+        "symbolic_floats": "NaN and Infinity are represented as strings in JSON and decoded by the harness; they are not bare JSON numeric literals.",
+        "proposed_timeout": "2 seconds per case is a testing configuration safety timeout, not an assignment performance requirement.",
+        "seeds": "Development and held-out seeds are separate; case counts and seeds are testing configuration, not assignment requirements."
     },
     "prerequisite_checks": [
         {
             "id": "PRE001",
-            "title": "Submission compiles with harness",
+            "title": "Compiles with required interface",
             "suite": "prerequisite",
             "difficulty": "not_applicable",
             "requirement_ids": [
                 "REQ001"
             ],
             "primary_category": "compilation",
-            "secondary_categories": [
-                "submission_structure"
-            ],
+            "secondary_categories": [],
             "verification_methods": [
                 "build"
             ],
-            "purpose": "Ensure the submission compiles after main removal and harness addition.",
-            "setup": "Remove any main function, add a harness main that calls square_root, and compile.",
+            "purpose": "Ensure the submission compiles when called by a harness using the specified signature.",
+            "setup": "Compile the submission with a harness that declares and calls double square_root(double, double, double).",
             "input": null,
             "expected_result": "Compilation succeeds.",
-            "comparison_rule": "Build success or failure.",
-            "oracle_basis": "Compiler and required function signature.",
-            "targeted_mistake": "Missing or incorrect function signature.",
-            "difficulty_reason": "Prerequisite check.",
-            "dependencies": [],
+            "comparison_rule": "Build success is exact.",
+            "oracle_basis": "Compiler under the proposed C++ configuration.",
+            "targeted_mistake": "Missing function, wrong signature, or syntax error.",
+            "difficulty_reason": "Prerequisite build check.",
             "readiness": "ready",
             "blocking_information": null,
-            "human_review_ids": []
+            "human_review_ids": [],
+            "dependencies": []
         },
         {
             "id": "PRE002",
-            "title": "Function structure and no main after preprocessing",
+            "title": "Function signature after main removal",
             "suite": "prerequisite",
             "difficulty": "not_applicable",
             "requirement_ids": [
                 "REQ001",
-                "REQ017"
+                "REQ012"
             ],
             "primary_category": "submission_structure",
-            "secondary_categories": [
-                "compilation"
-            ],
+            "secondary_categories": [],
             "verification_methods": [
-                "structure_check",
-                "static_analysis"
+                "structure_check"
             ],
-            "purpose": "Ensure the required function is present and no main remains after preprocessing.",
-            "setup": "Inspect the preprocessed source for the function signature and absence of main.",
+            "purpose": "Verify the required function signature is present after assessment preprocessing removes any main function.",
+            "setup": "Inspect the source after any main function has been removed by assessment preprocessing.",
             "input": null,
-            "expected_result": "The source contains double square_root(double n, double s, double e) and no main function after preprocessing.",
-            "comparison_rule": "Structural match.",
-            "oracle_basis": "Assignment specification.",
-            "targeted_mistake": "Missing function signature or retained main.",
-            "difficulty_reason": "Prerequisite check.",
-            "dependencies": [],
+            "expected_result": "A function with signature double square_root(double n, double s, double e) is present.",
+            "comparison_rule": "Exact presence of the required signature.",
+            "oracle_basis": "Assignment signature and main-removal preprocessing.",
+            "targeted_mistake": "Wrong signature or missing function after preprocessing.",
+            "difficulty_reason": "Prerequisite structure check.",
             "readiness": "ready",
             "blocking_information": null,
-            "human_review_ids": []
+            "human_review_ids": [],
+            "dependencies": []
         },
         {
             "id": "PRE003",
@@ -492,285 +461,233 @@
             "suite": "prerequisite",
             "difficulty": "not_applicable",
             "requirement_ids": [
-                "REQ013"
+                "REQ009"
+            ],
+            "primary_category": "source_restriction",
+            "secondary_categories": [],
+            "verification_methods": [
+                "static_analysis",
+                "manual_review"
+            ],
+            "purpose": "Check that only permitted include directives are present.",
+            "setup": "Inspect include directives in the submitted source.",
+            "input": null,
+            "expected_result": "Only <iostream>, <iomanip>, <cmath>, and <cassert> may appear.",
+            "comparison_rule": "Exact set of permitted includes.",
+            "oracle_basis": "Restriction 1 in the assignment.",
+            "targeted_mistake": "Disallowed include directive is present.",
+            "difficulty_reason": "Prerequisite source check.",
+            "readiness": "ready",
+            "blocking_information": null,
+            "human_review_ids": [],
+            "dependencies": []
+        },
+        {
+            "id": "PRE004",
+            "title": "No library square root replacement",
+            "suite": "prerequisite",
+            "difficulty": "not_applicable",
+            "requirement_ids": [
+                "REQ010"
             ],
             "primary_category": "source_restriction",
             "secondary_categories": [
-                "compilation"
+                "algorithm_compliance"
             ],
             "verification_methods": [
-                "static_analysis"
+                "static_analysis",
+                "manual_review"
             ],
-            "purpose": "Ensure only permitted include directives are present.",
-            "setup": "Inspect #include directives in the submission.",
+            "purpose": "Check that std::sqrt or another library square-root operation is not used in place of Newton's method.",
+            "setup": "Inspect the source for sqrt calls or equivalent library square-root operations.",
             "input": null,
-            "expected_result": "Only <iostream>, <iomanip>, <cmath>, and <cassert> are included.",
-            "comparison_rule": "Source inspection.",
-            "oracle_basis": "Assignment restriction.",
-            "targeted_mistake": "Disallowed include directive.",
-            "difficulty_reason": "Prerequisite check.",
-            "dependencies": [],
+            "expected_result": "No std::sqrt or other library square-root operation is used to compute the result.",
+            "comparison_rule": "Manual or static inspection for prohibited calls.",
+            "oracle_basis": "Restrictions 2 and 3 in the assignment.",
+            "targeted_mistake": "Uses std::sqrt or another library square-root operation instead of Newton's method.",
+            "difficulty_reason": "Prerequisite source check.",
             "readiness": "ready",
             "blocking_information": null,
-            "human_review_ids": []
+            "human_review_ids": [],
+            "dependencies": []
         }
     ],
     "test_suites": {
         "public": {
-            "purpose": "Easy tests of basic required behavior.",
+            "purpose": "Easy tests of basic required behavior, invalid parameters, n = 0, and a simple Newton update.",
             "deterministic_tests": [
                 {
                     "id": "PUB001",
-                    "title": "Valid n=0 returns 0.0",
+                    "title": "Negative n returns -1.0",
                     "suite": "public",
                     "difficulty": "easy",
                     "requirement_ids": [
-                        "REQ008"
+                        "REQ002",
+                        "REQ003"
                     ],
-                    "primary_category": "special_case",
+                    "primary_category": "input_validation",
                     "secondary_categories": [
-                        "result_correctness"
-                    ],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check the valid n=0 special case.",
-                    "setup": "Call square_root(0.0, 1.0, 1.0).",
-                    "input": "n=0.0, s=1.0, e=1.0",
-                    "expected_result": "0.0",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "Specification: valid n=0 returns 0.0.",
-                    "targeted_mistake": "Implementation performs a Newton update or ignores n=0.",
-                    "difficulty_reason": "Simple special case.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "ready",
-                    "blocking_information": null,
-                    "human_review_ids": []
-                },
-                {
-                    "id": "PUB002",
-                    "title": "Invalid s=0 returns -1.0",
-                    "suite": "public",
-                    "difficulty": "easy",
-                    "requirement_ids": [
-                        "REQ002",
-                        "REQ004"
-                    ],
-                    "primary_category": "input_validation",
-                    "secondary_categories": [],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check rejection of s <= 0.",
-                    "setup": "Call square_root(1.0, 0.0, 1.0).",
-                    "input": "n=1.0, s=0.0, e=1.0",
-                    "expected_result": "-1.0",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "Specification: invalid parameter returns -1.0.",
-                    "targeted_mistake": "Implementation accepts s=0.",
-                    "difficulty_reason": "Simple invalid parameter.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "ready",
-                    "blocking_information": null,
-                    "human_review_ids": []
-                },
-                {
-                    "id": "PUB003",
-                    "title": "Invalid e=0 returns -1.0",
-                    "suite": "public",
-                    "difficulty": "easy",
-                    "requirement_ids": [
-                        "REQ002",
-                        "REQ004"
-                    ],
-                    "primary_category": "input_validation",
-                    "secondary_categories": [],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check rejection of e <= 0.",
-                    "setup": "Call square_root(1.0, 1.0, 0.0).",
-                    "input": "n=1.0, s=1.0, e=0.0",
-                    "expected_result": "-1.0",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "Specification: invalid parameter returns -1.0.",
-                    "targeted_mistake": "Implementation accepts e=0.",
-                    "difficulty_reason": "Simple invalid parameter.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "ready",
-                    "blocking_information": null,
-                    "human_review_ids": []
-                },
-                {
-                    "id": "PUB004",
-                    "title": "Invalid n=-1 returns -1.0",
-                    "suite": "public",
-                    "difficulty": "easy",
-                    "requirement_ids": [
-                        "REQ002",
-                        "REQ004"
-                    ],
-                    "primary_category": "input_validation",
-                    "secondary_categories": [],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check rejection of n < 0.",
-                    "setup": "Call square_root(-1.0, 1.0, 1.0).",
-                    "input": "n=-1.0, s=1.0, e=1.0",
-                    "expected_result": "-1.0",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "Specification: invalid parameter returns -1.0.",
-                    "targeted_mistake": "Implementation accepts negative n.",
-                    "difficulty_reason": "Simple invalid parameter.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "ready",
-                    "blocking_information": null,
-                    "human_review_ids": []
-                },
-                {
-                    "id": "PUB005",
-                    "title": "Invalid NaN returns -1.0",
-                    "suite": "public",
-                    "difficulty": "easy",
-                    "requirement_ids": [
-                        "REQ003",
-                        "REQ004"
-                    ],
-                    "primary_category": "input_validation",
-                    "secondary_categories": [],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check rejection of NaN.",
-                    "setup": "Call square_root(NaN, 1.0, 1.0) using a harness-generated NaN.",
-                    "input": "n=NaN, s=1.0, e=1.0",
-                    "expected_result": "-1.0",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "Specification: NaN is invalid.",
-                    "targeted_mistake": "Implementation accepts NaN.",
-                    "difficulty_reason": "Simple invalid parameter.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "ready",
-                    "blocking_information": null,
-                    "human_review_ids": []
-                },
-                {
-                    "id": "PUB006",
-                    "title": "Simple Newton update returns new approximation",
-                    "suite": "public",
-                    "difficulty": "easy",
-                    "requirement_ids": [
-                        "REQ009",
-                        "REQ010",
-                        "REQ011",
-                        "REQ012"
-                    ],
-                    "primary_category": "result_correctness",
-                    "secondary_categories": [
-                        "algorithm_compliance",
                         "numerical_precision"
                     ],
                     "verification_methods": [
                         "runtime"
                     ],
-                    "purpose": "Check one Newton update and return of the new approximation.",
-                    "setup": "Call square_root(2.0, 1.0, 1.0).",
-                    "input": "n=2.0, s=1.0, e=1.0",
-                    "expected_result": "1.5",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "x1 = 0.5 * (1.0 + 2.0 / 1.0) = 1.5; |1.5 - 1.0| <= 1.0.",
-                    "targeted_mistake": "Implementation returns the previous approximation or uses a wrong formula.",
-                    "difficulty_reason": "One iteration with an exactly representable result.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
+                    "purpose": "Check that n < 0 is rejected.",
+                    "setup": "Call square_root(-1.0, 1.0, 1.0).",
+                    "input": {
+                        "n": -1.0,
+                        "s": 1.0,
+                        "e": 1.0
+                    },
+                    "expected_result": -1.0,
+                    "comparison_rule": "Exact double equality to -1.0.",
+                    "oracle_basis": "Assignment says invalid parameter returns -1.0.",
+                    "targeted_mistake": "Accepts negative n or returns a value other than -1.0.",
+                    "difficulty_reason": "Single invalid parameter.",
                     "readiness": "ready",
                     "blocking_information": null,
-                    "human_review_ids": []
+                    "human_review_ids": [],
+                    "dependencies": [
+                        "PRE001"
+                    ]
                 },
                 {
-                    "id": "PUB007",
-                    "title": "Invalid parameter displays error message",
+                    "id": "PUB002",
+                    "title": "Zero s returns -1.0",
+                    "suite": "public",
+                    "difficulty": "easy",
+                    "requirement_ids": [
+                        "REQ002",
+                        "REQ003"
+                    ],
+                    "primary_category": "input_validation",
+                    "secondary_categories": [
+                        "numerical_precision"
+                    ],
+                    "verification_methods": [
+                        "runtime"
+                    ],
+                    "purpose": "Check that s > 0 is enforced.",
+                    "setup": "Call square_root(1.0, 0.0, 1.0).",
+                    "input": {
+                        "n": 1.0,
+                        "s": 0.0,
+                        "e": 1.0
+                    },
+                    "expected_result": -1.0,
+                    "comparison_rule": "Exact double equality to -1.0.",
+                    "oracle_basis": "Assignment says invalid parameter returns -1.0.",
+                    "targeted_mistake": "Accepts s = 0 or returns a value other than -1.0.",
+                    "difficulty_reason": "Single invalid parameter.",
+                    "readiness": "ready",
+                    "blocking_information": null,
+                    "human_review_ids": [],
+                    "dependencies": [
+                        "PRE001"
+                    ]
+                },
+                {
+                    "id": "PUB003",
+                    "title": "Zero e returns -1.0",
+                    "suite": "public",
+                    "difficulty": "easy",
+                    "requirement_ids": [
+                        "REQ002",
+                        "REQ003"
+                    ],
+                    "primary_category": "input_validation",
+                    "secondary_categories": [
+                        "numerical_precision"
+                    ],
+                    "verification_methods": [
+                        "runtime"
+                    ],
+                    "purpose": "Check that e > 0 is enforced.",
+                    "setup": "Call square_root(1.0, 1.0, 0.0).",
+                    "input": {
+                        "n": 1.0,
+                        "s": 1.0,
+                        "e": 0.0
+                    },
+                    "expected_result": -1.0,
+                    "comparison_rule": "Exact double equality to -1.0.",
+                    "oracle_basis": "Assignment says invalid parameter returns -1.0.",
+                    "targeted_mistake": "Accepts e = 0 or returns a value other than -1.0.",
+                    "difficulty_reason": "Single invalid parameter.",
+                    "readiness": "ready",
+                    "blocking_information": null,
+                    "human_review_ids": [],
+                    "dependencies": [
+                        "PRE001"
+                    ]
+                },
+                {
+                    "id": "PUB004",
+                    "title": "Valid n = 0 returns 0.0",
                     "suite": "public",
                     "difficulty": "easy",
                     "requirement_ids": [
                         "REQ005"
                     ],
-                    "primary_category": "output_behavior",
+                    "primary_category": "special_case",
                     "secondary_categories": [
-                        "input_validation"
+                        "numerical_precision"
                     ],
                     "verification_methods": [
-                        "runtime",
-                        "manual_review"
+                        "runtime"
                     ],
-                    "purpose": "Check that an invalid parameter produces an error message.",
-                    "setup": "Capture stdout and stderr for square_root(1.0, 0.0, 1.0).",
-                    "input": "n=1.0, s=0.0, e=1.0",
-                    "expected_result": "Non-empty error output, location unspecified.",
-                    "comparison_rule": "Non-empty output.",
-                    "oracle_basis": "Specification requires an error message.",
-                    "targeted_mistake": "Implementation returns -1.0 but prints no error message.",
-                    "difficulty_reason": "Output location and wording are unspecified.",
+                    "purpose": "Check the valid n = 0 special case.",
+                    "setup": "Call square_root(0.0, 1.0, 1.0).",
+                    "input": {
+                        "n": 0.0,
+                        "s": 1.0,
+                        "e": 1.0
+                    },
+                    "expected_result": 0.0,
+                    "comparison_rule": "Exact double equality to 0.0.",
+                    "oracle_basis": "Assignment says valid n = 0 returns 0.0.",
+                    "targeted_mistake": "Returns a non-zero value for valid n = 0.",
+                    "difficulty_reason": "Simple special case.",
+                    "readiness": "ready",
+                    "blocking_information": null,
+                    "human_review_ids": [],
                     "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "blocked",
-                    "blocking_information": "HR002: error message location and verification are unresolved.",
-                    "human_review_ids": [
-                        "HR002"
+                        "PRE001"
                     ]
                 },
                 {
-                    "id": "PUB008",
-                    "title": "Invalid parameter performs no Newton updates",
+                    "id": "PUB005",
+                    "title": "First Newton update for n = 4 returns 2.5",
                     "suite": "public",
                     "difficulty": "easy",
                     "requirement_ids": [
-                        "REQ006"
+                        "REQ006",
+                        "REQ007"
                     ],
-                    "primary_category": "source_restriction",
+                    "primary_category": "result_correctness",
                     "secondary_categories": [
-                        "input_validation"
+                        "control_flow"
                     ],
                     "verification_methods": [
-                        "manual_review",
-                        "static_analysis"
+                        "runtime"
                     ],
-                    "purpose": "Check that invalid parameters do not cause Newton updates.",
-                    "setup": "Inspect source or use an instrumented harness for square_root(1.0, 0.0, 1.0).",
-                    "input": "n=1.0, s=0.0, e=1.0",
-                    "expected_result": "No Newton update is executed before returning -1.0.",
-                    "comparison_rule": "Source or manual inspection.",
-                    "oracle_basis": "Specification requires no Newton updates for invalid parameters.",
-                    "targeted_mistake": "Implementation performs an update before validation.",
-                    "difficulty_reason": "Internal behavior is not fully observable from output.",
+                    "purpose": "Check that the function performs the first Newton update and returns the new approximation.",
+                    "setup": "Call square_root(4.0, 1.0, 10.0).",
+                    "input": {
+                        "n": 4.0,
+                        "s": 1.0,
+                        "e": 10.0
+                    },
+                    "expected_result": 2.5,
+                    "comparison_rule": "Exact double equality to 2.5.",
+                    "oracle_basis": "x1 = 0.5 * (1 + 4/1) = 2.5; |2.5 - 1| = 1.5 <= 10.",
+                    "targeted_mistake": "Returns the previous value 1.0 or computes the Newton update incorrectly.",
+                    "difficulty_reason": "Simple one-update exact case.",
+                    "readiness": "ready",
+                    "blocking_information": null,
+                    "human_review_ids": [],
                     "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "blocked",
-                    "blocking_information": "HR002: verification of no Newton updates is unresolved.",
-                    "human_review_ids": [
-                        "HR002"
+                        "PRE001"
                     ]
                 }
             ],
@@ -782,605 +699,632 @@
                     "difficulty": "easy",
                     "requirement_ids": [
                         "REQ002",
-                        "REQ003",
-                        "REQ004"
+                        "REQ003"
                     ],
                     "primary_category": "input_validation",
                     "secondary_categories": [
-                        "output_behavior"
+                        "numerical_precision"
                     ],
-                    "purpose": "Generate invalid parameter cases and verify -1.0.",
-                    "generated_variables": "n, s, e",
-                    "valid_domain": "At least one invalid parameter: n < 0 or NaN/inf; s <= 0 or NaN/inf; e <= 0 or NaN/inf. Other parameters are valid.",
-                    "generation_strategy": "Choose one invalid parameter and generate valid values for the others; include NaN and infinities symbolically.",
-                    "variable_dependencies": "none",
-                    "sampling_parameters": "20 cases, seed 12345, round-trip decimal for finite values, symbolic NaN/inf.",
-                    "seed_policy": "Dedicated pseudorandom generator with seed 12345.",
-                    "case_count": 20,
+                    "purpose": "Generate invalid parameter cases and expect -1.0.",
+                    "difficulty_reason": "Invalid cases are simple but varied.",
+                    "readiness": "ready",
+                    "blocking_information": null,
+                    "human_review_ids": [],
+                    "generated_variables": "n, s, e as double values.",
+                    "valid_domain": "At least one parameter invalid: n < 0 or NaN/Infinity; s <= 0 or NaN/Infinity; e <= 0 or NaN/Infinity. Other parameters are finite and valid.",
+                    "generation_strategy": "Choose one invalid type; generate valid finite values for the others from a small bounded set; include symbolic NaN and Infinity.",
+                    "variable_dependencies": "Only one invalid parameter per case to isolate the validation rule.",
+                    "sampling_parameters": {
+                        "case_count": 20,
+                        "seed": 12345,
+                        "float_representation": "symbolic NaN/Infinity and decimal doubles"
+                    },
+                    "seed_policy": {
+                        "development_seed": 12345,
+                        "held_out_seed": 67890
+                    },
                     "oracle": "Specification: invalid parameters return -1.0.",
-                    "assertions": "Return value is exactly -1.0.",
-                    "state_setup_and_reset": "Independent calls; no shared state.",
-                    "failure_record": "Record input, expected -1.0, observed value, seed, case index, and generator configuration.",
-                    "targeted_mistakes": "Accepts invalid parameters or fails to validate all parameters.",
-                    "difficulty_reason": "Simple invalid cases.",
-                    "readiness": "ready",
-                    "blocking_information": null,
-                    "human_review_ids": []
-                },
-                {
-                    "id": "PUB-R002",
-                    "title": "Valid n=0 family",
-                    "suite": "public",
-                    "difficulty": "easy",
-                    "requirement_ids": [
-                        "REQ008"
-                    ],
-                    "primary_category": "special_case",
-                    "secondary_categories": [
-                        "result_correctness"
-                    ],
-                    "purpose": "Generate valid n=0 cases and verify 0.0.",
-                    "generated_variables": "s, e",
-                    "valid_domain": "n=0.0, s > 0 finite, e > 0 finite.",
-                    "generation_strategy": "Generate random finite positive s and e.",
-                    "variable_dependencies": "none",
-                    "sampling_parameters": "20 cases, seed 12345, round-trip decimal.",
-                    "seed_policy": "Dedicated pseudorandom generator with seed 12345.",
-                    "case_count": 20,
-                    "oracle": "Specification: valid n=0 returns 0.0.",
-                    "assertions": "Return value is exactly 0.0.",
-                    "state_setup_and_reset": "Independent calls; no shared state.",
-                    "failure_record": "Record input, expected 0.0, observed value, seed, case index, and generator configuration.",
-                    "targeted_mistakes": "Performs a Newton update for n=0 or returns a nonzero value.",
-                    "difficulty_reason": "Simple special case.",
-                    "readiness": "ready",
-                    "blocking_information": null,
-                    "human_review_ids": []
+                    "assertions": "Return exactly -1.0; optionally combined stdout/stderr is non-empty.",
+                    "state_setup_and_reset": "Reset process state between cases.",
+                    "failure_record": "Record generated input, expected -1.0, observed return, seed, case index, and output capture.",
+                    "targeted_mistakes": "Fails to validate one parameter or returns a value other than -1.0.",
+                    "case_count": 20
                 }
             ]
         },
         "release": {
-            "purpose": "Medium tests of broader behavior and representative boundaries.",
+            "purpose": "Medium tests of broader behavior, validation order, boundary stopping, and exact one-update cases.",
             "deterministic_tests": [
                 {
                     "id": "REL001",
-                    "title": "n=0 with invalid s returns -1.0",
+                    "title": "n = 0 with invalid s returns -1.0",
                     "suite": "release",
                     "difficulty": "medium",
                     "requirement_ids": [
-                        "REQ007",
-                        "REQ004"
+                        "REQ004",
+                        "REQ003"
                     ],
-                    "primary_category": "special_case",
+                    "primary_category": "input_validation",
                     "secondary_categories": [
-                        "input_validation"
+                        "special_case"
                     ],
                     "verification_methods": [
                         "runtime"
                     ],
-                    "purpose": "Check validation before n=0 handling.",
+                    "purpose": "Check that all parameters are validated before handling n = 0.",
                     "setup": "Call square_root(0.0, 0.0, 1.0).",
-                    "input": "n=0.0, s=0.0, e=1.0",
-                    "expected_result": "-1.0",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "Specification: validate all parameters before n=0.",
-                    "targeted_mistake": "Implementation handles n=0 before validating s.",
-                    "difficulty_reason": "Interaction of special case and validation.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
+                    "input": {
+                        "n": 0.0,
+                        "s": 0.0,
+                        "e": 1.0
+                    },
+                    "expected_result": -1.0,
+                    "comparison_rule": "Exact double equality to -1.0.",
+                    "oracle_basis": "Assignment requires validation before n = 0 and invalid return -1.0.",
+                    "targeted_mistake": "Handles n = 0 before validating s and returns 0.0.",
+                    "difficulty_reason": "Interaction of n = 0 and validation order.",
                     "readiness": "ready",
                     "blocking_information": null,
-                    "human_review_ids": []
-                },
-                {
-                    "id": "REL002",
-                    "title": "n=0 with invalid e returns -1.0",
-                    "suite": "release",
-                    "difficulty": "medium",
-                    "requirement_ids": [
-                        "REQ007",
-                        "REQ004"
-                    ],
-                    "primary_category": "special_case",
-                    "secondary_categories": [
-                        "input_validation"
-                    ],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check validation before n=0 handling for e.",
-                    "setup": "Call square_root(0.0, 1.0, 0.0).",
-                    "input": "n=0.0, s=1.0, e=0.0",
-                    "expected_result": "-1.0",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "Specification: validate all parameters before n=0.",
-                    "targeted_mistake": "Implementation handles n=0 before validating e.",
-                    "difficulty_reason": "Interaction of special case and validation.",
+                    "human_review_ids": [],
                     "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "ready",
-                    "blocking_information": null,
-                    "human_review_ids": []
-                },
-                {
-                    "id": "REL003",
-                    "title": "n=0 with invalid NaN s returns -1.0",
-                    "suite": "release",
-                    "difficulty": "medium",
-                    "requirement_ids": [
-                        "REQ007",
-                        "REQ003",
-                        "REQ004"
-                    ],
-                    "primary_category": "special_case",
-                    "secondary_categories": [
-                        "input_validation"
-                    ],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check finiteness validation before n=0 handling.",
-                    "setup": "Call square_root(0.0, NaN, 1.0) using a harness-generated NaN.",
-                    "input": "n=0.0, s=NaN, e=1.0",
-                    "expected_result": "-1.0",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "Specification: NaN is invalid and validation precedes n=0.",
-                    "targeted_mistake": "Implementation handles n=0 before checking finiteness.",
-                    "difficulty_reason": "Interaction of special case and finiteness validation.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "ready",
-                    "blocking_information": null,
-                    "human_review_ids": []
-                },
-                {
-                    "id": "REL004",
-                    "title": "Multiple Newton iterations for n=1",
-                    "suite": "release",
-                    "difficulty": "medium",
-                    "requirement_ids": [
-                        "REQ009",
-                        "REQ010",
-                        "REQ011",
-                        "REQ012"
-                    ],
-                    "primary_category": "result_correctness",
-                    "secondary_categories": [
-                        "algorithm_compliance",
-                        "numerical_precision"
-                    ],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check multiple Newton iterations and return of the new approximation.",
-                    "setup": "Call square_root(1.0, 2.0, 0.1).",
-                    "input": "n=1.0, s=2.0, e=0.1",
-                    "expected_result": "1.0003048780487805 (reference Newton double value; comparison policy pending HR001)",
-                    "comparison_rule": "Pending HR001; proposed reference double with approved tolerance.",
-                    "oracle_basis": "Independent Newton reference: x1=1.25, x2=1.025, x3=1.0003048780487805, first update satisfying tolerance.",
-                    "targeted_mistake": "Implementation uses a different stopping criterion or returns the previous approximation.",
-                    "difficulty_reason": "Multiple iterations and non-exact result.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "blocked",
-                    "blocking_information": "HR001: comparison tolerance for valid Newton outputs is unresolved.",
-                    "human_review_ids": [
-                        "HR001"
+                        "PRE001"
                     ]
                 },
                 {
-                    "id": "REL005",
-                    "title": "Invalid negative infinity returns -1.0",
+                    "id": "REL002",
+                    "title": "n = 0 with invalid e returns -1.0",
                     "suite": "release",
                     "difficulty": "medium",
                     "requirement_ids": [
-                        "REQ003",
-                        "REQ004"
+                        "REQ004",
+                        "REQ003"
                     ],
                     "primary_category": "input_validation",
-                    "secondary_categories": [],
+                    "secondary_categories": [
+                        "special_case"
+                    ],
                     "verification_methods": [
                         "runtime"
                     ],
-                    "purpose": "Check rejection of negative infinity.",
-                    "setup": "Call square_root(-inf, 1.0, 1.0) using a harness-generated negative infinity.",
-                    "input": "n=-inf, s=1.0, e=1.0",
-                    "expected_result": "-1.0",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "Specification: infinity is invalid.",
-                    "targeted_mistake": "Implementation accepts infinity.",
-                    "difficulty_reason": "Simple invalid parameter.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
+                    "purpose": "Check that e is validated before handling n = 0.",
+                    "setup": "Call square_root(0.0, 1.0, 0.0).",
+                    "input": {
+                        "n": 0.0,
+                        "s": 1.0,
+                        "e": 0.0
+                    },
+                    "expected_result": -1.0,
+                    "comparison_rule": "Exact double equality to -1.0.",
+                    "oracle_basis": "Assignment requires validation before n = 0 and invalid return -1.0.",
+                    "targeted_mistake": "Handles n = 0 before validating e and returns 0.0.",
+                    "difficulty_reason": "Interaction of n = 0 and validation order.",
                     "readiness": "ready",
                     "blocking_information": null,
-                    "human_review_ids": []
+                    "human_review_ids": [],
+                    "dependencies": [
+                        "PRE001"
+                    ]
                 },
                 {
-                    "id": "REL006",
-                    "title": "Valid call produces no successful output",
+                    "id": "REL003",
+                    "title": "Boundary equality stops at first update",
                     "suite": "release",
                     "difficulty": "medium",
                     "requirement_ids": [
-                        "REQ016"
+                        "REQ006",
+                        "REQ007",
+                        "REQ008"
                     ],
-                    "primary_category": "output_behavior",
+                    "primary_category": "control_flow",
                     "secondary_categories": [
                         "result_correctness"
                     ],
                     "verification_methods": [
                         "runtime"
                     ],
-                    "purpose": "Check that a valid call does not display successful results.",
-                    "setup": "Capture stdout for square_root(2.0, 1.0, 1.0).",
-                    "input": "n=2.0, s=1.0, e=1.0",
-                    "expected_result": "stdout is empty.",
-                    "comparison_rule": "Exact empty stdout.",
-                    "oracle_basis": "Specification: no successful result display.",
-                    "targeted_mistake": "Implementation prints the approximation or other successful output.",
-                    "difficulty_reason": "Observable output behavior.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
+                    "purpose": "Check that |x1 - x0| == e stops at the first update.",
+                    "setup": "Call square_root(4.0, 1.0, 1.5).",
+                    "input": {
+                        "n": 4.0,
+                        "s": 1.0,
+                        "e": 1.5
+                    },
+                    "expected_result": 2.5,
+                    "comparison_rule": "Exact double equality to 2.5.",
+                    "oracle_basis": "x1 = 2.5; |2.5 - 1| = 1.5 <= 1.5.",
+                    "targeted_mistake": "Uses strict inequality instead of <= or continues after the first update.",
+                    "difficulty_reason": "Boundary equality in the stopping condition.",
                     "readiness": "ready",
                     "blocking_information": null,
-                    "human_review_ids": []
+                    "human_review_ids": [],
+                    "dependencies": [
+                        "PRE001"
+                    ]
+                },
+                {
+                    "id": "REL004",
+                    "title": "Consecutive difference, not residual, stops",
+                    "suite": "release",
+                    "difficulty": "medium",
+                    "requirement_ids": [
+                        "REQ006",
+                        "REQ007",
+                        "REQ008"
+                    ],
+                    "primary_category": "control_flow",
+                    "secondary_categories": [
+                        "result_correctness"
+                    ],
+                    "verification_methods": [
+                        "runtime"
+                    ],
+                    "purpose": "Check that the stopping condition uses consecutive difference rather than residual |n - x^2|.",
+                    "setup": "Call square_root(16.0, 1.0, 10.0).",
+                    "input": {
+                        "n": 16.0,
+                        "s": 1.0,
+                        "e": 10.0
+                    },
+                    "expected_result": 8.5,
+                    "comparison_rule": "Exact double equality to 8.5.",
+                    "oracle_basis": "x1 = 8.5; |8.5 - 1| = 7.5 <= 10, but residual |16 - 8.5^2| = 56.25 > 10.",
+                    "targeted_mistake": "Uses residual or another stopping criterion and continues past the first update.",
+                    "difficulty_reason": "Distinguishes consecutive-difference stopping from residual stopping.",
+                    "readiness": "ready",
+                    "blocking_information": null,
+                    "human_review_ids": [],
+                    "dependencies": [
+                        "PRE001"
+                    ]
+                },
+                {
+                    "id": "REL005",
+                    "title": "Exact one-update case for n = 1",
+                    "suite": "release",
+                    "difficulty": "medium",
+                    "requirement_ids": [
+                        "REQ006",
+                        "REQ007"
+                    ],
+                    "primary_category": "result_correctness",
+                    "secondary_categories": [
+                        "control_flow"
+                    ],
+                    "verification_methods": [
+                        "runtime"
+                    ],
+                    "purpose": "Check another exact one-update case with a nontrivial starting guess.",
+                    "setup": "Call square_root(1.0, 2.0, 0.75).",
+                    "input": {
+                        "n": 1.0,
+                        "s": 2.0,
+                        "e": 0.75
+                    },
+                    "expected_result": 1.25,
+                    "comparison_rule": "Exact double equality to 1.25.",
+                    "oracle_basis": "x1 = 0.5 * (2 + 1/2) = 1.25; |1.25 - 2| = 0.75 <= 0.75.",
+                    "targeted_mistake": "Computes the Newton update incorrectly or returns the previous value.",
+                    "difficulty_reason": "Exact one-update case with a different starting guess.",
+                    "readiness": "ready",
+                    "blocking_information": null,
+                    "human_review_ids": [],
+                    "dependencies": [
+                        "PRE001"
+                    ]
+                },
+                {
+                    "id": "REL006",
+                    "title": "Multiple-update non-exact case",
+                    "suite": "release",
+                    "difficulty": "medium",
+                    "requirement_ids": [
+                        "REQ006",
+                        "REQ007"
+                    ],
+                    "primary_category": "result_correctness",
+                    "secondary_categories": [
+                        "control_flow"
+                    ],
+                    "verification_methods": [
+                        "runtime"
+                    ],
+                    "purpose": "Check a multiple-update case whose result is not exactly representable.",
+                    "setup": "Call square_root(4.0, 1.0, 1.4).",
+                    "input": {
+                        "n": 4.0,
+                        "s": 1.0,
+                        "e": 1.4
+                    },
+                    "expected_result": "2.05 as produced by an independent Newton reference; the decimal is illustrative, not an approved acceptance value.",
+                    "comparison_rule": "Unresolved; pending HR001.",
+                    "oracle_basis": "Independent Newton simulation with the specified stopping rule; comparison policy unresolved.",
+                    "targeted_mistake": "Incorrect multiple-update result or stopping behavior.",
+                    "difficulty_reason": "Multiple updates and non-exact floating-point result.",
+                    "readiness": "blocked",
+                    "blocking_information": "Comparison tolerance or exact expression policy for non-exact results is unresolved (HR001).",
+                    "human_review_ids": [
+                        "HR001"
+                    ],
+                    "dependencies": [
+                        "PRE001"
+                    ]
                 }
             ],
             "randomized_test_families": [
                 {
                     "id": "REL-R001",
-                    "title": "Valid Newton family",
+                    "title": "Valid n = 0 family",
                     "suite": "release",
                     "difficulty": "medium",
                     "requirement_ids": [
-                        "REQ009",
-                        "REQ010",
-                        "REQ011",
-                        "REQ012"
-                    ],
-                    "primary_category": "result_correctness",
-                    "secondary_categories": [
-                        "algorithm_compliance",
-                        "numerical_precision"
-                    ],
-                    "purpose": "Generate valid Newton cases and compare with an independent reference.",
-                    "generated_variables": "n, s, e",
-                    "valid_domain": "n > 0 finite, s > 0 finite, e > 0 finite. Experimental caps: n <= 1e6, s <= 1e6, e >= 1e-6 to bound iterations.",
-                    "generation_strategy": "Generate uniform random finite doubles within the experimental caps; include boundary neighborhoods for n, s, and e.",
-                    "variable_dependencies": "none",
-                    "sampling_parameters": "30 cases, seed 12345, round-trip decimal or hexadecimal serialization.",
-                    "seed_policy": "Dedicated pseudorandom generator with seed 12345.",
-                    "case_count": 30,
-                    "oracle": "Independent reference implementation of Newton's method using the same formula and stopping rule, not std::sqrt.",
-                    "assertions": "Returned value matches the reference under the approved comparison policy; the first-update property is checked where feasible.",
-                    "state_setup_and_reset": "Independent calls; no shared state.",
-                    "failure_record": "Record input, reference result, observed result, seed, case index, generator configuration, and comparison policy.",
-                    "targeted_mistakes": "Wrong iteration formula, wrong stopping criterion, or returning the previous approximation.",
-                    "difficulty_reason": "Multiple iterations and non-exact results.",
-                    "readiness": "blocked",
-                    "blocking_information": "HR001: comparison tolerance for valid Newton outputs is unresolved.",
-                    "human_review_ids": [
-                        "HR001"
-                    ]
-                }
-            ]
-        },
-        "private": {
-            "purpose": "Difficult tests of subtle cases and interacting requirements.",
-            "deterministic_tests": [
-                {
-                    "id": "PRI001",
-                    "title": "Boundary tolerance uses <=",
-                    "suite": "private",
-                    "difficulty": "difficult",
-                    "requirement_ids": [
-                        "REQ010",
-                        "REQ011",
-                        "REQ012"
-                    ],
-                    "primary_category": "result_correctness",
-                    "secondary_categories": [
-                        "algorithm_compliance"
-                    ],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check that the stopping condition uses <=, not <.",
-                    "setup": "Call square_root(2.0, 1.0, 0.5).",
-                    "input": "n=2.0, s=1.0, e=0.5",
-                    "expected_result": "1.5",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "x1=1.5, |1.5 - 1.0| = 0.5 <= 0.5, so stop at first update.",
-                    "targeted_mistake": "Implementation uses < instead of <= and continues to x2.",
-                    "difficulty_reason": "Boundary equality case.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "ready",
-                    "blocking_information": null,
-                    "human_review_ids": []
-                },
-                {
-                    "id": "PRI002",
-                    "title": "First update satisfying tolerance is returned",
-                    "suite": "private",
-                    "difficulty": "difficult",
-                    "requirement_ids": [
-                        "REQ010",
-                        "REQ011",
-                        "REQ012"
-                    ],
-                    "primary_category": "result_correctness",
-                    "secondary_categories": [
-                        "algorithm_compliance",
-                        "numerical_precision"
-                    ],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check that the implementation stops at the first update satisfying the tolerance.",
-                    "setup": "Call square_root(2.0, 1.0, 0.1).",
-                    "input": "n=2.0, s=1.0, e=0.1",
-                    "expected_result": "1.4166666666666667 (reference Newton double value; comparison policy pending HR001)",
-                    "comparison_rule": "Pending HR001; proposed reference double with approved tolerance.",
-                    "oracle_basis": "Independent Newton reference: x1=1.5, x2=1.4166666666666667, first update satisfying |x2 - x1| <= 0.1.",
-                    "targeted_mistake": "Implementation continues past the first satisfying update.",
-                    "difficulty_reason": "Requires stopping at the first update, not a later more accurate value.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "blocked",
-                    "blocking_information": "HR001: comparison tolerance for valid Newton outputs is unresolved.",
-                    "human_review_ids": [
-                        "HR001"
-                    ]
-                },
-                {
-                    "id": "PRI004",
-                    "title": "n=0 with all invalid parameters returns -1.0",
-                    "suite": "private",
-                    "difficulty": "difficult",
-                    "requirement_ids": [
-                        "REQ007",
-                        "REQ003",
-                        "REQ004"
+                        "REQ005"
                     ],
                     "primary_category": "special_case",
                     "secondary_categories": [
                         "input_validation"
                     ],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check that n=0 does not bypass validation of all parameters.",
-                    "setup": "Call square_root(0.0, NaN, NaN) using harness-generated NaN values.",
-                    "input": "n=0.0, s=NaN, e=NaN",
-                    "expected_result": "-1.0",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "Specification: validate all parameters before n=0.",
-                    "targeted_mistake": "Implementation returns 0.0 before validating s or e.",
-                    "difficulty_reason": "Interaction of special case and multiple invalid parameters.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
+                    "purpose": "Generate valid n = 0 cases and expect 0.0.",
+                    "difficulty_reason": "Varied positive s and e values.",
                     "readiness": "ready",
                     "blocking_information": null,
-                    "human_review_ids": []
+                    "human_review_ids": [],
+                    "generated_variables": "s, e positive finite doubles.",
+                    "valid_domain": "s > 0, e > 0, finite; n = 0.",
+                    "generation_strategy": "Generate positive finite s and e, including small and large values; avoid NaN and Infinity.",
+                    "variable_dependencies": "None.",
+                    "sampling_parameters": {
+                        "case_count": 20,
+                        "seed": 12345,
+                        "float_representation": "decimal doubles"
+                    },
+                    "seed_policy": {
+                        "development_seed": 12345,
+                        "held_out_seed": 67890
+                    },
+                    "oracle": "Specification: valid n = 0 returns 0.0.",
+                    "assertions": "Return exactly 0.0.",
+                    "state_setup_and_reset": "Reset state between cases.",
+                    "failure_record": "Record s, e, expected 0.0, observed return, seed, and case index.",
+                    "targeted_mistakes": "Performs a Newton update for n = 0 or returns a non-zero value.",
+                    "case_count": 20
                 },
                 {
-                    "id": "PRI005",
-                    "title": "Invalid positive infinity e returns -1.0",
-                    "suite": "private",
-                    "difficulty": "difficult",
+                    "id": "REL-R002",
+                    "title": "Exact one-update dyadic family",
+                    "suite": "release",
+                    "difficulty": "medium",
                     "requirement_ids": [
-                        "REQ003",
-                        "REQ004"
+                        "REQ006",
+                        "REQ007"
                     ],
-                    "primary_category": "input_validation",
-                    "secondary_categories": [],
-                    "verification_methods": [
-                        "runtime"
-                    ],
-                    "purpose": "Check rejection of positive infinity in e.",
-                    "setup": "Call square_root(1.0, 1.0, inf) using a harness-generated positive infinity.",
-                    "input": "n=1.0, s=1.0, e=inf",
-                    "expected_result": "-1.0",
-                    "comparison_rule": "Exact double equality.",
-                    "oracle_basis": "Specification: infinity is invalid.",
-                    "targeted_mistake": "Implementation accepts infinity.",
-                    "difficulty_reason": "Simple invalid parameter.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
-                    "readiness": "ready",
-                    "blocking_information": null,
-                    "human_review_ids": []
-                },
-                {
-                    "id": "PRI006",
-                    "title": "Manual review of Newton implementation and library restriction",
-                    "suite": "private",
-                    "difficulty": "difficult",
-                    "requirement_ids": [
-                        "REQ014",
-                        "REQ015"
-                    ],
-                    "primary_category": "source_restriction",
+                    "primary_category": "result_correctness",
                     "secondary_categories": [
-                        "algorithm_compliance"
+                        "control_flow"
+                    ],
+                    "purpose": "Generate exact one-update cases where x1 is dyadic and e is at least the consecutive difference.",
+                    "difficulty_reason": "Exact arithmetic with varied exponents.",
+                    "readiness": "ready",
+                    "blocking_information": null,
+                    "human_review_ids": [],
+                    "generated_variables": "a, b integers; e double.",
+                    "valid_domain": "a, b in 0..6; n = 2^a; s = 2^b; e >= |x1 - s|.",
+                    "generation_strategy": "Choose a and b; compute x1 = 0.5 * (s + n/s) as an exact dyadic value; set e to the difference or a larger exact value.",
+                    "variable_dependencies": "e depends on x1 and s.",
+                    "sampling_parameters": {
+                        "case_count": 20,
+                        "seed": 12345,
+                        "float_representation": "exact dyadic doubles"
+                    },
+                    "seed_policy": {
+                        "development_seed": 12345,
+                        "held_out_seed": 67890
+                    },
+                    "oracle": "Exact dyadic x1 from the specified formula.",
+                    "assertions": "Return exactly x1.",
+                    "state_setup_and_reset": "Reset state between cases.",
+                    "failure_record": "Record a, b, e, expected x1, observed return, seed, and case index.",
+                    "targeted_mistakes": "Wrong Newton formula, returns previous value, or continues after the first update.",
+                    "case_count": 20
+                },
+                {
+                    "id": "REL-R003",
+                    "title": "Multiple-update non-exact family",
+                    "suite": "release",
+                    "difficulty": "medium",
+                    "requirement_ids": [
+                        "REQ006",
+                        "REQ007"
+                    ],
+                    "primary_category": "result_correctness",
+                    "secondary_categories": [
+                        "control_flow"
+                    ],
+                    "purpose": "Generate multiple-update cases with non-exact results.",
+                    "difficulty_reason": "Moderate but comparison policy unresolved.",
+                    "readiness": "blocked",
+                    "blocking_information": "Comparison tolerance or exact expression policy for non-exact results is unresolved (HR001).",
+                    "human_review_ids": [
+                        "HR001"
+                    ],
+                    "generated_variables": "n, s, e positive finite doubles.",
+                    "valid_domain": "n > 0, s > 0, e > 0, finite.",
+                    "generation_strategy": "Generate small positive values likely to require at least two updates; avoid NaN and Infinity.",
+                    "variable_dependencies": "None.",
+                    "sampling_parameters": {
+                        "case_count": 20,
+                        "seed": 12345,
+                        "float_representation": "decimal doubles"
+                    },
+                    "seed_policy": {
+                        "development_seed": 12345,
+                        "held_out_seed": 67890
+                    },
+                    "oracle": "Independent Newton simulation with the specified stopping rule.",
+                    "assertions": "Compare to oracle using unresolved policy.",
+                    "state_setup_and_reset": "Reset state between cases.",
+                    "failure_record": "Record generated input, oracle result, observed result, seed, and case index.",
+                    "targeted_mistakes": "Incorrect iteration or stopping.",
+                    "case_count": 20
+                }
+            ]
+        },
+        "private": {
+            "purpose": "Difficult tests of subtle validation interactions, output contract, and stopping-criterion distinctions.",
+            "deterministic_tests": [
+                {
+                    "id": "PRI001",
+                    "title": "Multiple-update convergence case",
+                    "suite": "private",
+                    "difficulty": "difficult",
+                    "requirement_ids": [
+                        "REQ006",
+                        "REQ007"
+                    ],
+                    "primary_category": "result_correctness",
+                    "secondary_categories": [
+                        "control_flow"
                     ],
                     "verification_methods": [
-                        "manual_review",
-                        "static_analysis"
+                        "runtime"
                     ],
-                    "purpose": "Check that Newton's method is implemented manually and no library operation replaces it.",
-                    "setup": "Inspect the source for Newton iteration and prohibited library operations.",
-                    "input": null,
-                    "expected_result": "The source implements Newton's method and does not use std::sqrt or another library operation to compute the square root.",
-                    "comparison_rule": "Manual or source inspection.",
-                    "oracle_basis": "Assignment restrictions.",
-                    "targeted_mistake": "Implementation uses std::sqrt or another library operation instead of Newton's method.",
-                    "difficulty_reason": "The scope of 'another library operation' is unresolved.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
+                    "purpose": "Check multiple Newton updates for a case that converges to an exact value in a reference double simulation.",
+                    "setup": "Call square_root(4.0, 1.0, 1e-8).",
+                    "input": {
+                        "n": 4.0,
+                        "s": 1.0,
+                        "e": 1e-08
+                    },
+                    "expected_result": "2.0 as produced by an independent Newton reference; exact 2.0 is the intended analytical limit.",
+                    "comparison_rule": "Unresolved; pending HR001 because equivalent C++ expressions may round differently.",
+                    "oracle_basis": "Independent Newton simulation; comparison policy unresolved.",
+                    "targeted_mistake": "Stops too early, fails to converge, or returns a non-converged value.",
+                    "difficulty_reason": "Multiple updates and rounding-sensitive convergence.",
                     "readiness": "blocked",
-                    "blocking_information": "HR003: criteria for 'another library operation' are unresolved.",
+                    "blocking_information": "Comparison or exact-expression policy for multiple-update results is unresolved (HR001).",
                     "human_review_ids": [
-                        "HR003"
+                        "HR001"
+                    ],
+                    "dependencies": [
+                        "PRE001"
                     ]
                 },
                 {
-                    "id": "PRI007",
-                    "title": "No input reading",
+                    "id": "PRI002",
+                    "title": "n = 0 with NaN s returns -1.0",
                     "suite": "private",
                     "difficulty": "difficult",
                     "requirement_ids": [
-                        "REQ016"
+                        "REQ004",
+                        "REQ003"
                     ],
-                    "primary_category": "source_restriction",
+                    "primary_category": "input_validation",
                     "secondary_categories": [
-                        "output_behavior"
+                        "numerical_precision"
                     ],
                     "verification_methods": [
-                        "static_analysis"
+                        "runtime"
                     ],
-                    "purpose": "Check that the function does not read input.",
-                    "setup": "Inspect the source for input operations such as cin.",
-                    "input": null,
-                    "expected_result": "No input reading is present in the function.",
-                    "comparison_rule": "Source inspection.",
-                    "oracle_basis": "Assignment restriction.",
-                    "targeted_mistake": "Implementation reads input.",
-                    "difficulty_reason": "Source-level restriction.",
-                    "dependencies": [
-                        "PRE001",
-                        "PRE002"
-                    ],
+                    "purpose": "Check that NaN s is validated before n = 0 is handled.",
+                    "setup": "Call square_root(0.0, NaN, 1.0).",
+                    "input": {
+                        "n": 0.0,
+                        "s": "NaN",
+                        "e": 1.0
+                    },
+                    "expected_result": -1.0,
+                    "comparison_rule": "Exact double equality to -1.0.",
+                    "oracle_basis": "Assignment requires finite validation before n = 0 and invalid return -1.0.",
+                    "targeted_mistake": "Handles n = 0 before validating s and returns 0.0.",
+                    "difficulty_reason": "Interaction of NaN validation and n = 0.",
                     "readiness": "ready",
                     "blocking_information": null,
-                    "human_review_ids": []
+                    "human_review_ids": [],
+                    "dependencies": [
+                        "PRE001"
+                    ]
                 },
                 {
-                    "id": "PRI008",
-                    "title": "Valid n=0 performs no Newton updates",
+                    "id": "PRI003",
+                    "title": "n = 0 with infinite e returns -1.0",
                     "suite": "private",
                     "difficulty": "difficult",
                     "requirement_ids": [
-                        "REQ008",
-                        "REQ006"
+                        "REQ004",
+                        "REQ003"
                     ],
-                    "primary_category": "source_restriction",
+                    "primary_category": "input_validation",
                     "secondary_categories": [
-                        "special_case"
+                        "numerical_precision"
                     ],
                     "verification_methods": [
-                        "manual_review",
-                        "static_analysis"
+                        "runtime"
                     ],
-                    "purpose": "Check that valid n=0 does not perform Newton updates.",
-                    "setup": "Inspect source or use an instrumented harness for square_root(0.0, 1.0, 1.0).",
-                    "input": "n=0.0, s=1.0, e=1.0",
-                    "expected_result": "No Newton update is executed before returning 0.0.",
-                    "comparison_rule": "Source or manual inspection.",
-                    "oracle_basis": "Specification: valid n=0 returns 0.0 without Newton updates.",
-                    "targeted_mistake": "Implementation performs a Newton update for n=0.",
-                    "difficulty_reason": "Internal behavior is not fully observable from output.",
+                    "purpose": "Check that infinite e is validated before n = 0 is handled.",
+                    "setup": "Call square_root(0.0, 1.0, Infinity).",
+                    "input": {
+                        "n": 0.0,
+                        "s": 1.0,
+                        "e": "Infinity"
+                    },
+                    "expected_result": -1.0,
+                    "comparison_rule": "Exact double equality to -1.0.",
+                    "oracle_basis": "Assignment requires finite validation before n = 0 and invalid return -1.0.",
+                    "targeted_mistake": "Handles n = 0 before validating e and returns 0.0.",
+                    "difficulty_reason": "Interaction of infinity validation and n = 0.",
+                    "readiness": "ready",
+                    "blocking_information": null,
+                    "human_review_ids": [],
                     "dependencies": [
-                        "PRE001",
-                        "PRE002"
+                        "PRE001"
+                    ]
+                },
+                {
+                    "id": "PRI004",
+                    "title": "Valid call displays no successful result",
+                    "suite": "private",
+                    "difficulty": "difficult",
+                    "requirement_ids": [
+                        "REQ011"
                     ],
-                    "readiness": "blocked",
-                    "blocking_information": "HR002: verification of no Newton updates is unresolved.",
-                    "human_review_ids": [
-                        "HR002"
+                    "primary_category": "output_contract",
+                    "secondary_categories": [],
+                    "verification_methods": [
+                        "runtime",
+                        "manual_review"
+                    ],
+                    "purpose": "Check that a valid call does not display a successful result.",
+                    "setup": "Call square_root(1.0, 1.0, 1.0) and capture stdout and stderr.",
+                    "input": {
+                        "n": 1.0,
+                        "s": 1.0,
+                        "e": 1.0
+                    },
+                    "expected_result": "No output on stdout or stderr.",
+                    "comparison_rule": "Captured stdout and stderr are both empty.",
+                    "oracle_basis": "Assignment says the function must not display successful results.",
+                    "targeted_mistake": "Prints the successful approximation or other success output.",
+                    "difficulty_reason": "Output contract requires capture and manual confirmation of no success output.",
+                    "readiness": "ready",
+                    "blocking_information": null,
+                    "human_review_ids": [],
+                    "dependencies": [
+                        "PRE001"
+                    ]
+                },
+                {
+                    "id": "PRI005",
+                    "title": "Invalid call displays an error message",
+                    "suite": "private",
+                    "difficulty": "difficult",
+                    "requirement_ids": [
+                        "REQ003"
+                    ],
+                    "primary_category": "output_contract",
+                    "secondary_categories": [
+                        "input_validation"
+                    ],
+                    "verification_methods": [
+                        "runtime",
+                        "manual_review"
+                    ],
+                    "purpose": "Check that an invalid call displays some error message.",
+                    "setup": "Call square_root(-1.0, 1.0, 1.0) and capture stdout and stderr.",
+                    "input": {
+                        "n": -1.0,
+                        "s": 1.0,
+                        "e": 1.0
+                    },
+                    "expected_result": "Combined stdout or stderr is non-empty.",
+                    "comparison_rule": "At least one of stdout or stderr contains a non-empty string.",
+                    "oracle_basis": "Assignment requires displaying an error message for invalid parameters; wording is not prescribed.",
+                    "targeted_mistake": "Returns -1.0 but displays no error message.",
+                    "difficulty_reason": "Error message stream and wording are unspecified, requiring output capture and manual confirmation.",
+                    "readiness": "ready",
+                    "blocking_information": null,
+                    "human_review_ids": [],
+                    "dependencies": [
+                        "PRE001"
                     ]
                 }
             ],
             "randomized_test_families": [
                 {
                     "id": "PRI-R001",
-                    "title": "n=0 invalid parameter family",
+                    "title": "Consecutive-difference versus residual family",
                     "suite": "private",
                     "difficulty": "difficult",
                     "requirement_ids": [
-                        "REQ007",
-                        "REQ003",
-                        "REQ004"
+                        "REQ008",
+                        "REQ007"
                     ],
-                    "primary_category": "special_case",
+                    "primary_category": "control_flow",
                     "secondary_categories": [
-                        "input_validation"
+                        "result_correctness"
                     ],
-                    "purpose": "Generate n=0 cases with invalid parameters and verify -1.0.",
-                    "generated_variables": "s, e",
-                    "valid_domain": "n=0.0; at least one of s or e is invalid: s <= 0 or NaN/inf, e <= 0 or NaN/inf.",
-                    "generation_strategy": "Generate invalid s or e and valid values for the other parameter; include NaN and infinities symbolically.",
-                    "variable_dependencies": "none",
-                    "sampling_parameters": "20 cases, seed 12345, round-trip decimal for finite values, symbolic NaN/inf.",
-                    "seed_policy": "Dedicated pseudorandom generator with seed 12345.",
-                    "case_count": 20,
-                    "oracle": "Specification: invalid parameters return -1.0 before n=0 handling.",
-                    "assertions": "Return value is exactly -1.0.",
-                    "state_setup_and_reset": "Independent calls; no shared state.",
-                    "failure_record": "Record input, expected -1.0, observed value, seed, case index, and generator configuration.",
-                    "targeted_mistakes": "Implementation handles n=0 before validation or accepts invalid parameters.",
-                    "difficulty_reason": "Interaction of special case and validation.",
+                    "purpose": "Generate cases where |x1 - s| <= e but residual |n - x1^2| > e.",
+                    "difficulty_reason": "Subtle stopping-criterion distinction.",
                     "readiness": "ready",
                     "blocking_information": null,
-                    "human_review_ids": []
+                    "human_review_ids": [],
+                    "generated_variables": "a integer; e double.",
+                    "valid_domain": "a in 2..6; n = 2^a; s = 1; e = |x1 - s|.",
+                    "generation_strategy": "Compute x1 = 0.5 * (1 + 2^a), diff = 0.5 * (2^a - 1), residual = |2^a - x1^2|; set e = diff; ensure residual > e.",
+                    "variable_dependencies": "e depends on x1.",
+                    "sampling_parameters": {
+                        "case_count": 10,
+                        "seed": 12345,
+                        "float_representation": "exact dyadic doubles"
+                    },
+                    "seed_policy": {
+                        "development_seed": 12345,
+                        "held_out_seed": 67890
+                    },
+                    "oracle": "Exact x1 from the specified formula.",
+                    "assertions": "Return exactly x1; a residual-based implementation would continue.",
+                    "state_setup_and_reset": "Reset state between cases.",
+                    "failure_record": "Record a, expected x1, observed return, seed, and case index.",
+                    "targeted_mistakes": "Uses residual or another stopping criterion.",
+                    "case_count": 10
                 },
                 {
                     "id": "PRI-R002",
-                    "title": "Boundary tolerance family",
+                    "title": "Difficult multiple-update non-exact family",
                     "suite": "private",
                     "difficulty": "difficult",
                     "requirement_ids": [
-                        "REQ010",
-                        "REQ011",
-                        "REQ012"
+                        "REQ006",
+                        "REQ007"
                     ],
                     "primary_category": "result_correctness",
                     "secondary_categories": [
-                        "algorithm_compliance",
-                        "numerical_precision"
+                        "control_flow"
                     ],
-                    "purpose": "Generate cases where e is near the first update difference and verify the first-update stopping rule.",
-                    "generated_variables": "n, s, e",
-                    "valid_domain": "n > 0 finite, s > 0 finite, e > 0 finite. Experimental caps: n <= 1e6, s <= 1e6, e >= 1e-6.",
-                    "generation_strategy": "Generate n and s, compute x1, set e near |x1 - s|, and compare with the reference first-update result.",
-                    "variable_dependencies": "e depends on n and s through the first Newton update.",
-                    "sampling_parameters": "20 cases, seed 12345, round-trip decimal or hexadecimal serialization.",
-                    "seed_policy": "Dedicated pseudorandom generator with seed 12345.",
-                    "case_count": 20,
-                    "oracle": "Independent reference Newton implementation using the same formula and stopping rule.",
-                    "assertions": "Returned value matches the reference first-update result under the approved comparison policy.",
-                    "state_setup_and_reset": "Independent calls; no shared state.",
-                    "failure_record": "Record input, reference result, observed result, seed, case index, generator configuration, and comparison policy.",
-                    "targeted_mistakes": "Wrong inequality, wrong stopping criterion, or returning a later approximation.",
-                    "difficulty_reason": "Boundary and first-update interaction.",
+                    "purpose": "Generate difficult multiple-update cases with non-exact results.",
+                    "difficulty_reason": "Subtle but comparison policy unresolved.",
                     "readiness": "blocked",
-                    "blocking_information": "HR001: comparison tolerance for valid Newton outputs is unresolved.",
+                    "blocking_information": "Comparison tolerance or exact expression policy for non-exact results is unresolved (HR001).",
                     "human_review_ids": [
                         "HR001"
-                    ]
+                    ],
+                    "generated_variables": "n, s, e positive finite doubles.",
+                    "valid_domain": "n > 0, s > 0, e > 0, finite.",
+                    "generation_strategy": "Generate values causing multiple updates and non-exact intermediate results; avoid NaN and Infinity.",
+                    "variable_dependencies": "None.",
+                    "sampling_parameters": {
+                        "case_count": 20,
+                        "seed": 12345,
+                        "float_representation": "decimal doubles"
+                    },
+                    "seed_policy": {
+                        "development_seed": 12345,
+                        "held_out_seed": 67890
+                    },
+                    "oracle": "Independent Newton simulation with the specified stopping rule.",
+                    "assertions": "Compare to oracle using unresolved policy.",
+                    "state_setup_and_reset": "Reset state between cases.",
+                    "failure_record": "Record generated input, oracle result, observed result, seed, and case index.",
+                    "targeted_mistakes": "Incorrect iteration or stopping.",
+                    "case_count": 20
                 }
             ]
         }
@@ -1397,474 +1341,336 @@
                 "PRE002"
             ],
             "blocked_test_ids": [],
-            "coverage_status": "ready"
+            "notes": "Signature and build coverage."
         },
         {
             "requirement_id": "REQ002",
             "test_ids": [
+                "PUB001",
                 "PUB002",
                 "PUB003",
-                "PUB004",
                 "PUB-R001"
             ],
             "ready_test_ids": [
+                "PUB001",
                 "PUB002",
                 "PUB003",
-                "PUB004",
                 "PUB-R001"
             ],
             "blocked_test_ids": [],
-            "coverage_status": "ready"
+            "notes": "Invalid constraint and finite-value coverage."
         },
         {
             "requirement_id": "REQ003",
             "test_ids": [
-                "PUB005",
+                "PUB001",
+                "PUB002",
+                "PUB003",
                 "PUB-R001",
-                "REL003",
-                "REL005",
-                "PRI004",
-                "PRI005",
-                "PRI-R001"
+                "REL001",
+                "REL002",
+                "PRI002",
+                "PRI003",
+                "PRI005"
             ],
             "ready_test_ids": [
-                "PUB005",
+                "PUB001",
+                "PUB002",
+                "PUB003",
                 "PUB-R001",
-                "REL003",
-                "REL005",
-                "PRI004",
-                "PRI005",
-                "PRI-R001"
+                "REL001",
+                "REL002",
+                "PRI002",
+                "PRI003",
+                "PRI005"
             ],
             "blocked_test_ids": [],
-            "coverage_status": "ready"
+            "notes": "Return -1.0 and error output are tested; internal absence of Newton updates is not fully observable."
         },
         {
             "requirement_id": "REQ004",
             "test_ids": [
-                "PUB002",
-                "PUB003",
-                "PUB004",
-                "PUB005",
-                "PUB-R001",
                 "REL001",
                 "REL002",
-                "REL003",
-                "REL005",
-                "PRI004",
-                "PRI005",
-                "PRI-R001"
+                "PRI002",
+                "PRI003"
             ],
             "ready_test_ids": [
-                "PUB002",
-                "PUB003",
-                "PUB004",
-                "PUB005",
-                "PUB-R001",
                 "REL001",
                 "REL002",
-                "REL003",
-                "REL005",
-                "PRI004",
-                "PRI005",
-                "PRI-R001"
+                "PRI002",
+                "PRI003"
             ],
             "blocked_test_ids": [],
-            "coverage_status": "ready"
+            "notes": "Validation before n = 0 is tested by invalid parameters with n = 0."
         },
         {
             "requirement_id": "REQ005",
             "test_ids": [
-                "PUB007"
+                "PUB004",
+                "REL-R001"
             ],
-            "ready_test_ids": [],
-            "blocked_test_ids": [
-                "PUB007"
+            "ready_test_ids": [
+                "PUB004",
+                "REL-R001"
             ],
-            "coverage_status": "blocked"
+            "blocked_test_ids": [],
+            "notes": "Return 0.0 for valid n = 0 is tested; internal absence of Newton updates is not fully observable."
         },
         {
             "requirement_id": "REQ006",
             "test_ids": [
-                "PUB008",
-                "PRI008"
+                "PUB005",
+                "REL003",
+                "REL004",
+                "REL005",
+                "REL006",
+                "REL-R002",
+                "REL-R003",
+                "PRI001",
+                "PRI-R002"
             ],
-            "ready_test_ids": [],
+            "ready_test_ids": [
+                "PUB005",
+                "REL003",
+                "REL004",
+                "REL005",
+                "REL-R002"
+            ],
             "blocked_test_ids": [
-                "PUB008",
-                "PRI008"
+                "REL006",
+                "REL-R003",
+                "PRI001",
+                "PRI-R002"
             ],
-            "coverage_status": "blocked"
+            "notes": "Exact one-update cases are ready; non-exact multiple-update cases are blocked pending comparison policy."
         },
         {
             "requirement_id": "REQ007",
             "test_ids": [
-                "REL001",
-                "REL002",
+                "PUB005",
                 "REL003",
-                "PRI004",
-                "PRI-R001"
+                "REL004",
+                "REL005",
+                "REL006",
+                "REL-R002",
+                "REL-R003",
+                "PRI001",
+                "PRI-R001",
+                "PRI-R002"
             ],
             "ready_test_ids": [
-                "REL001",
-                "REL002",
+                "PUB005",
                 "REL003",
-                "PRI004",
+                "REL004",
+                "REL005",
+                "REL-R002",
                 "PRI-R001"
             ],
-            "blocked_test_ids": [],
-            "coverage_status": "ready"
+            "blocked_test_ids": [
+                "REL006",
+                "REL-R003",
+                "PRI001",
+                "PRI-R002"
+            ],
+            "notes": "Stopping and return-new behavior are covered by exact cases; non-exact cases are blocked."
         },
         {
             "requirement_id": "REQ008",
             "test_ids": [
-                "PUB001",
-                "PUB-R002",
-                "PRI008"
+                "REL003",
+                "REL004",
+                "PRI-R001"
             ],
             "ready_test_ids": [
-                "PUB001",
-                "PUB-R002"
+                "REL003",
+                "REL004",
+                "PRI-R001"
             ],
-            "blocked_test_ids": [
-                "PRI008"
-            ],
-            "coverage_status": "partial"
+            "blocked_test_ids": [],
+            "notes": "Consecutive-difference stopping is distinguished from residual-based stopping using exact cases."
         },
         {
             "requirement_id": "REQ009",
             "test_ids": [
-                "PUB006",
-                "REL004",
-                "REL-R001",
-                "PRI002"
+                "PRE003"
             ],
             "ready_test_ids": [
-                "PUB006"
+                "PRE003"
             ],
-            "blocked_test_ids": [
-                "REL004",
-                "REL-R001",
-                "PRI002"
-            ],
-            "coverage_status": "partial"
+            "blocked_test_ids": [],
+            "notes": "Include restriction is checked by static/manual inspection."
         },
         {
             "requirement_id": "REQ010",
             "test_ids": [
-                "PUB006",
-                "REL004",
-                "PRI001",
-                "PRI002",
-                "REL-R001",
-                "PRI-R002"
+                "PRE004"
             ],
             "ready_test_ids": [
-                "PUB006",
-                "PRI001"
+                "PRE004"
             ],
-            "blocked_test_ids": [
-                "REL004",
-                "PRI002",
-                "REL-R001",
-                "PRI-R002"
-            ],
-            "coverage_status": "partial"
+            "blocked_test_ids": [],
+            "notes": "No library square-root replacement is checked by static/manual inspection; obfuscated use may not be fully detected."
         },
         {
             "requirement_id": "REQ011",
             "test_ids": [
-                "PUB006",
-                "REL004",
-                "PRI001",
-                "PRI002",
-                "REL-R001",
-                "PRI-R002"
+                "PRI004"
             ],
             "ready_test_ids": [
-                "PUB006",
-                "PRI001"
+                "PRI004"
             ],
-            "blocked_test_ids": [
-                "REL004",
-                "PRI002",
-                "REL-R001",
-                "PRI-R002"
-            ],
-            "coverage_status": "partial"
+            "blocked_test_ids": [],
+            "notes": "No successful output is tested; no input reading is not directly tested."
         },
         {
             "requirement_id": "REQ012",
             "test_ids": [
-                "PUB006",
-                "REL004",
-                "PRI001",
-                "PRI002",
-                "REL-R001",
-                "PRI-R002"
-            ],
-            "ready_test_ids": [
-                "PUB006",
-                "PRI001"
-            ],
-            "blocked_test_ids": [
-                "REL004",
-                "PRI002",
-                "REL-R001",
-                "PRI-R002"
-            ],
-            "coverage_status": "partial"
-        },
-        {
-            "requirement_id": "REQ013",
-            "test_ids": [
-                "PRE003"
-            ],
-            "ready_test_ids": [
-                "PRE003"
-            ],
-            "blocked_test_ids": [],
-            "coverage_status": "ready"
-        },
-        {
-            "requirement_id": "REQ014",
-            "test_ids": [
-                "PRI006"
-            ],
-            "ready_test_ids": [],
-            "blocked_test_ids": [
-                "PRI006"
-            ],
-            "coverage_status": "blocked"
-        },
-        {
-            "requirement_id": "REQ015",
-            "test_ids": [
-                "REL008",
-                "PRI006"
-            ],
-            "ready_test_ids": [],
-            "blocked_test_ids": [
-                "REL008",
-                "PRI006"
-            ],
-            "coverage_status": "blocked"
-        },
-        {
-            "requirement_id": "REQ016",
-            "test_ids": [
-                "REL006",
-                "PRI007"
-            ],
-            "ready_test_ids": [
-                "REL006",
-                "PRI007"
-            ],
-            "blocked_test_ids": [],
-            "coverage_status": "ready"
-        },
-        {
-            "requirement_id": "REQ017",
-            "test_ids": [
                 "PRE002"
             ],
             "ready_test_ids": [
                 "PRE002"
             ],
             "blocked_test_ids": [],
-            "coverage_status": "ready"
+            "notes": "Main removal is treated as assessment preprocessing; tests assess behavior after removal."
         }
     ],
     "ambiguities": [
         {
-            "id": "AMB001",
-            "description": "The error message wording and output stream are unspecified, and no Newton updates is an internal property not fully observable from output.",
-            "affected_requirement_ids": [
-                "REQ005",
-                "REQ006"
+            "description": "No grader comparison tolerance or exact C++ expression is specified for non-exact Newton results.",
+            "requirement_ids": [
+                "REQ006",
+                "REQ007"
             ],
-            "affected_test_ids": [
-                "PUB007",
-                "PUB008",
-                "PRI008"
-            ],
-            "review_id": "HR002"
-        },
-        {
-            "id": "AMB002",
-            "description": "The assignment does not specify a comparison tolerance for valid Newton outputs.",
-            "affected_requirement_ids": [
-                "REQ009",
-                "REQ010",
-                "REQ011",
-                "REQ012"
-            ],
-            "affected_test_ids": [
-                "REL004",
-                "REL-R001",
-                "PRI002",
+            "test_ids": [
+                "REL006",
+                "REL-R003",
+                "PRI001",
                 "PRI-R002"
             ],
-            "review_id": "HR001"
+            "human_review_ids": [
+                "HR001"
+            ]
         },
         {
-            "id": "AMB003",
-            "description": "The phrase 'another library operation' is broad and cannot be fully verified by static analysis alone.",
-            "affected_requirement_ids": [
-                "REQ014",
-                "REQ015"
+            "description": "The error message stream and wording are unspecified; only non-empty output can be tested automatically.",
+            "requirement_ids": [
+                "REQ003"
             ],
-            "affected_test_ids": [
-                "REL008",
-                "PRI006"
+            "test_ids": [
+                "PRI005"
             ],
-            "review_id": "HR003"
+            "human_review_ids": []
+        },
+        {
+            "description": "The requirement to perform no Newton updates for invalid parameters and valid n = 0 is not fully observable from runtime output.",
+            "requirement_ids": [
+                "REQ003",
+                "REQ005"
+            ],
+            "test_ids": [
+                "PUB001",
+                "PUB004"
+            ],
+            "human_review_ids": []
+        },
+        {
+            "description": "Main removal is assessment preprocessing; original main presence should not be penalized.",
+            "requirement_ids": [
+                "REQ012"
+            ],
+            "test_ids": [
+                "PRE002"
+            ],
+            "human_review_ids": []
         }
     ],
     "coverage_gaps": [
         {
-            "requirement_id": "REQ005",
-            "explanation": "Error message verification is blocked pending HR002."
+            "description": "Non-exact multiple-update results are not graded until a comparison policy is resolved.",
+            "requirement_ids": [
+                "REQ006",
+                "REQ007"
+            ],
+            "test_ids": [
+                "REL006",
+                "REL-R003",
+                "PRI001",
+                "PRI-R002"
+            ],
+            "human_review_ids": [
+                "HR001"
+            ]
         },
         {
-            "requirement_id": "REQ006",
-            "explanation": "Verification of no Newton updates is blocked pending HR002."
+            "description": "Internal absence of Newton updates for invalid parameters and valid n = 0 is not fully verifiable by runtime output.",
+            "requirement_ids": [
+                "REQ003",
+                "REQ005"
+            ],
+            "test_ids": [
+                "PUB001",
+                "PUB004"
+            ],
+            "human_review_ids": []
         },
         {
-            "requirement_id": "REQ008",
-            "explanation": "Return 0.0 is covered by ready tests, but no Newton updates is blocked pending HR002."
+            "description": "No input reading is not directly tested.",
+            "requirement_ids": [
+                "REQ011"
+            ],
+            "test_ids": [],
+            "human_review_ids": []
         },
         {
-            "requirement_id": "REQ009",
-            "explanation": "Exact simple cases are ready, but non-exact Newton cases are blocked pending HR001."
-        },
-        {
-            "requirement_id": "REQ010",
-            "explanation": "Exact boundary cases are ready, but non-exact first-update cases are blocked pending HR001."
-        },
-        {
-            "requirement_id": "REQ011",
-            "explanation": "Exact cases are ready, but non-exact return-new cases are blocked pending HR001."
-        },
-        {
-            "requirement_id": "REQ012",
-            "explanation": "Exact cases are ready, but non-exact tolerance-criterion cases are blocked pending HR001."
-        },
-        {
-            "requirement_id": "REQ014",
-            "explanation": "Manual review of Newton implementation is blocked pending HR003."
-        },
-        {
-            "requirement_id": "REQ015",
-            "explanation": "Verification of the library restriction is blocked pending HR003."
+            "description": "The no-library-square-root restriction is only checked by static/manual inspection and may miss obfuscated use.",
+            "requirement_ids": [
+                "REQ010"
+            ],
+            "test_ids": [
+                "PRE004"
+            ],
+            "human_review_ids": []
         }
     ],
     "downstream_notes": [
-        "Implement the specified interfaces, generators, assertions, and comparison rules faithfully.",
-        "Use exact equality for -1.0 and 0.0 unless a human-approved comparison policy is supplied.",
-        "Do not use blocked tests for grading until the linked human review requests are resolved.",
-        "Remove any main function before testing, as stated in the assignment, and add a harness main.",
-        "Capture stdout and stderr for output behavior tests.",
-        "Record exact failing inputs, expected results or violated properties, observed results, seed, case index, generator configuration, and relevant runtime versions.",
-        "Distinguish submission failures, prerequisite failures, blocked tests, and harness errors.",
-        "Keep private-suite details in instructor-controlled configuration."
+        "Use exact comparison for -1.0, 0.0, and exactly representable dyadic expected values.",
+        "Decode symbolic NaN and Infinity strings in generated inputs; do not use bare JSON numeric literals for NaN or Infinity.",
+        "Capture both stdout and stderr for error-message and no-success-output tests.",
+        "Treat main removal as assessment preprocessing and do not penalize the original submission for containing main.",
+        "Keep blocked tests and families pending HR001; do not use them for grading until the comparison policy is resolved.",
+        "Route manual_review checks for includes and no-library-square-root to a human or static analyzer; do not treat a successful build as proof of source restrictions.",
+        "Do not use the submission's own output as the oracle for Newton correctness."
     ],
     "human_review_required": true,
     "human_review_requests": [
         {
             "id": "HR001",
             "status": "pending",
-            "reason": "The assignment specifies Newton's method and a stopping tolerance but does not specify a comparison tolerance for valid returned approximations.",
+            "reason": "The assignment specifies the stopping tolerance e but does not specify a grader comparison tolerance or an exact C++ expression for the returned Newton approximation. Non-exact multiple-update results therefore require a comparison policy.",
             "source_refs": [
-                "S1: Calculation"
+                {
+                    "source_id": "S1",
+                    "location": "Calculation",
+                    "excerpt": "Stop at the first update satisfying: |x_{k+1} - x_k| <= e. Return the new approximation, x_{k+1}, rather than the previous value, x_k."
+                }
             ],
-            "affected_requirement_ids": [
-                "REQ009",
-                "REQ010",
-                "REQ011",
-                "REQ012"
-            ],
+            "affected_requirement_ids": [],
             "affected_test_ids": [
-                "REL004",
-                "REL-R001",
-                "PRI002",
+                "REL006",
+                "REL-R003",
+                "PRI001",
                 "PRI-R002"
             ],
-            "affected_dimensions": [
-                "result_correctness",
-                "algorithm_compliance",
-                "numerical_precision"
-            ],
-            "question_for_reviewer": "What comparison policy should be used for valid Newton outputs?",
+            "affected_dimensions": [],
+            "question_for_reviewer": "What comparison rule should be used for non-exact Newton results: exact bit match to a specified reference expression, a fixed tolerance, a tolerance derived from e or double precision, or should non-exact tests remain blocked?",
             "options": [
-                "Exact bit equality.",
-                "Absolute or relative tolerance with a justified value.",
-                "Property-based check using the stopping condition and next update.",
-                "Reference implementation with an approved tolerance."
+                "Use exact bit match to a specified reference implementation using 0.5 * (x + n/x).",
+                "Use a fixed absolute or relative tolerance for returned approximations.",
+                "Use a tolerance derived from the stopping tolerance e and double precision.",
+                "Keep non-exact tests blocked and grade only exact sentinel and dyadic cases."
             ],
-            "recommended_action": "Approve a small absolute or relative tolerance, or a property-based check, for valid Newton outputs while keeping exact equality for -1.0 and 0.0.",
-            "blocking": true,
-            "resolution": null
-        },
-        {
-            "id": "HR002",
-            "status": "pending",
-            "reason": "The requirement to display an error message and not perform Newton updates is not fully observable from runtime output, and the error message location is unspecified.",
-            "source_refs": [
-                "S1: Parameter validation"
-            ],
-            "affected_requirement_ids": [
-                "REQ005",
-                "REQ006"
-            ],
-            "affected_test_ids": [
-                "PUB007",
-                "PUB008",
-                "PRI008"
-            ],
-            "affected_dimensions": [
-                "output_behavior",
-                "source_restriction",
-                "special_case"
-            ],
-            "question_for_reviewer": "How should error message display and no Newton updates be assessed?",
-            "options": [
-                "Require non-empty stdout or stderr.",
-                "Use source or manual review for no Newton updates.",
-                "Assess only the -1.0 return value and not the error message or no-update property.",
-                "Use an instrumented harness to detect Newton updates."
-            ],
-            "recommended_action": "Assess the -1.0 return value automatically and use manual or source review for error message and no-update requirements, or define an output location and instrumentation policy.",
-            "blocking": true,
-            "resolution": null
-        },
-        {
-            "id": "HR003",
-            "status": "pending",
-            "reason": "The restriction against 'another library operation' is broad and cannot be fully verified by static analysis alone.",
-            "source_refs": [
-                "S1: Restrictions 3"
-            ],
-            "affected_requirement_ids": [
-                "REQ014",
-                "REQ015"
-            ],
-            "affected_test_ids": [
-                "REL008",
-                "PRI006"
-            ],
-            "affected_dimensions": [
-                "source_restriction",
-                "algorithm_compliance"
-            ],
-            "question_for_reviewer": "What static or manual criteria should be used to verify that no library operation replaces Newton's method?",
-            "options": [
-                "Static ban std::sqrt and common math functions.",
-                "Manual review for any library operation that computes the square root.",
-                "Assess only std::sqrt and not other library operations.",
-                "Use reference implementation comparison as a proxy."
-            ],
-            "recommended_action": "Use a static ban on std::sqrt and sqrt, plus manual review for other library operations that compute the square root.",
+            "recommended_action": "Adopt a defensible comparison policy for non-exact results; until resolved, keep the affected non-exact tests blocked.",
             "blocking": true,
             "resolution": null
         }
